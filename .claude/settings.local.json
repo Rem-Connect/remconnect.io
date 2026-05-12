@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"c:\\\\Users\\\\REM-2D\\\\.claude\\\\projects\\\\c--Users-REM-2D-Desktop-remconnect-online\\\\tool-results\\\\extracted\\\\remconnect-io\" 2>/dev/null || echo \"NOT FOUND\")",
+      "Read(//c/Users/REM-2D/.claude/projects/c--Users-REM-2D-Desktop-remconnect-online/tool-results/extracted/**)",
+      "Bash(find /c/Users/REM-2D/.claude -name \"*.png\" -o -name \"*.svg\" 2>/dev/null | head -20)",
+      "Read(//c/Users/REM-2D/.claude/**)",
+      "Bash(cp /c/Users/REM-2D/.claude/projects/c--Users-REM-2D-Desktop-remconnect-online/515df2f7-bdb9-4c02-b867-8ce910489e55/tool-results/extracted/remconnect-io/project/assets/remconnect-logo.png /c/Users/REM-2D/Desktop/remconnect-online/public/assets/)",
+      "Bash(cp /c/Users/REM-2D/.claude/projects/c--Users-REM-2D-Desktop-remconnect-online/515df2f7-bdb9-4c02-b867-8ce910489e55/tool-results/extracted/remconnect-io/project/assets/remconnect-mark.png /c/Users/REM-2D/Desktop/remconnect-online/public/assets/)",
+      "Bash(npm run *)"
+    ]
+  }
+}
