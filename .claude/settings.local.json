@@ -7,7 +7,13 @@
       "Read(//c/Users/REM-2D/.claude/**)",
       "Bash(cp /c/Users/REM-2D/.claude/projects/c--Users-REM-2D-Desktop-remconnect-online/515df2f7-bdb9-4c02-b867-8ce910489e55/tool-results/extracted/remconnect-io/project/assets/remconnect-logo.png /c/Users/REM-2D/Desktop/remconnect-online/public/assets/)",
       "Bash(cp /c/Users/REM-2D/.claude/projects/c--Users-REM-2D-Desktop-remconnect-online/515df2f7-bdb9-4c02-b867-8ce910489e55/tool-results/extracted/remconnect-io/project/assets/remconnect-mark.png /c/Users/REM-2D/Desktop/remconnect-online/public/assets/)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "WebFetch(domain:api.anthropic.com)",
+      "PowerShell($file = \"C:\\\\Users\\\\REM-2D\\\\.claude\\\\projects\\\\c--Users-REM-2D-Desktop-remconnect-online\\\\e18d977e-54e3-4691-82a3-1cca4eb9408b\\\\tool-results\\\\webfetch-1778616022429-s2whyv.bin\"; $outDir = \"C:\\\\Users\\\\REM-2D\\\\.claude\\\\projects\\\\c--Users-REM-2D-Desktop-remconnect-online\\\\design-extract\"; New-Item -ItemType Directory -Force -Path $outDir | Out-Null; $inStream = [System.IO.File]::OpenRead\\($file\\); $gzip = [System.IO.Compression.GZipStream]::new\\($inStream, [System.IO.Compression.CompressionMode]::Decompress\\); $outStream = [System.IO.File]::Create\\(\"$outDir\\\\design.bin\"\\); $gzip.CopyTo\\($outStream\\); $outStream.Close\\(\\); $gzip.Close\\(\\); $inStream.Close\\(\\); \"Decompressed size: $\\(\\(Get-Item \"$outDir\\\\design.bin\"\\).Length\\) bytes\")",
+      "PowerShell($outDir = \"C:\\\\Users\\\\REM-2D\\\\.claude\\\\projects\\\\c--Users-REM-2D-Desktop-remconnect-online\\\\design-extract\"; $bytes = [System.IO.File]::ReadAllBytes\\(\"$outDir\\\\design.bin\"\\); $header = [System.Text.Encoding]::ASCII.GetString\\($bytes[0..511]\\); Write-Output $header)",
+      "PowerShell($outDir = \"C:\\\\Users\\\\REM-2D\\\\.claude\\\\projects\\\\c--Users-REM-2D-Desktop-remconnect-online\\\\design-extract\"; $extractDir = \"$outDir\\\\extracted\"; New-Item -ItemType Directory -Force -Path $extractDir | Out-Null; tar -xf \"$outDir\\\\design.bin\" -C $extractDir; Get-ChildItem $extractDir -Recurse | Select-Object FullName)",
+      "Bash(npx tsc *)",
+      "Bash(npx next *)"
     ]
   }
 }
