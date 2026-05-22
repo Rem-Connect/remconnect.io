@@ -124,9 +124,22 @@ export function AgentsView() {
                   <td style={{ paddingLeft: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{ position: 'relative', flexShrink: 0 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: agent.avatar, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#fff' }}>
-                          {agent.name.charAt(0)}
-                        </div>
+                        {(() => {
+                          const isPhoto = agent.avatar.startsWith('/') || agent.avatar.startsWith('http')
+                          return (
+                            <div style={{
+                              width: 32, height: 32, borderRadius: '50%',
+                              background: isPhoto ? 'var(--net-surface-2)' : agent.avatar,
+                              backgroundImage: isPhoto ? `url(${agent.avatar})` : 'none',
+                              backgroundSize: 'cover', backgroundPosition: 'center',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 12, fontWeight: 700, color: '#fff',
+                              border: isPhoto ? '1px solid var(--net-border)' : 'none',
+                            }}>
+                              {!isPhoto && agent.name.charAt(0)}
+                            </div>
+                          )
+                        })()}
                         {agent.online && <div style={{ position: 'absolute', bottom: 0, right: 0, width: 8, height: 8, borderRadius: '50%', background: 'var(--net-healthy)', border: '2px solid var(--net-surface)' }}/>}
                       </div>
                       <div>

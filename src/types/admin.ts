@@ -52,10 +52,12 @@ export interface SampleAgent {
   langs: string[]
   skills: string[]
   rate: number
+  photo?: string
 }
 
 export interface AgentProfileExtras {
   headline: string
+  photo?: string
   pitch: string
   location: string
   timezone: string

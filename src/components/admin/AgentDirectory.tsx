@@ -2,11 +2,24 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Icon } from '@/components/ui/Icon'
-import { Avatar } from '@/components/ui/Avatar'
 import { ScoreRing } from '@/components/ui/ScoreRing'
 import { SAMPLE_AGENTS } from '@/lib/admin-data'
+import { getAgentPhoto, isExternalPhoto } from '@/lib/agent-photo'
 import type { SampleAgent } from '@/types/admin'
+
+function AgentAvatar({ agent, size }: { agent: SampleAgent; size: number }) {
+  const src = agent.photo || getAgentPhoto(agent.id, size * 2)
+  const border = '1px solid #e3e0d2'
+  const wrap = { width: size, height: size, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, border } as const
+
+  if (isExternalPhoto(src)) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <div style={wrap}><img src={src} alt={agent.name} width={size} height={size} style={{ objectFit: 'cover', width: '100%', height: '100%' }} /></div>
+  }
+  return <div style={wrap}><Image src={src} alt={agent.name} width={size} height={size} style={{ objectFit: 'cover', width: '100%', height: '100%' }} /></div>
+}
 
 type View = 'table' | 'cards'
 type Status = SampleAgent['status'] | 'all'
@@ -173,7 +186,7 @@ export function AgentDirectory() {
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = i % 2 === 1 ? 'rgba(243,241,234,0.3)' : '#fff'}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Avatar name={a.name} tone={i} size={30} />
+                <AgentAvatar agent={a} size={30} />
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 500 }}>{stealth ? a.name.split(' ')[0] + ' ' + a.name.split(' ').slice(1).map(w => w[0] + '.').join(' ') : a.name}</div>
                   <div style={{ fontSize: 11, color: '#5a6072', fontFamily: 'monospace' }}>{a.id}</div>
@@ -218,7 +231,7 @@ export function AgentDirectory() {
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#e3e0d2'}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                <Avatar name={a.name} tone={i} size={40} />
+                <AgentAvatar agent={a} size={40} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13.5, fontWeight: 600 }}>
                     {stealth ? a.name.split(' ')[0] + ' ' + a.name.split(' ').slice(1).map(w => w[0] + '.').join(' ') : a.name}

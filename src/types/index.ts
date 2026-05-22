@@ -6,6 +6,8 @@ export interface NavItem {
   icon: string
   badge?: number
   showWhen?: AgentStatus[]
+  isHeader?: boolean
+  indent?: boolean
 }
 
 export interface NavGroup {

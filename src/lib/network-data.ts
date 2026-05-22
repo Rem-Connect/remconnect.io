@@ -1,5 +1,6 @@
 import type { NetworkAgent, HistoryRow, NetworkIncident, IspStats, ShiftSession, TestLogRow } from '@/types/network';
 import { mulberry32 } from './network-utils';
+import { getAgentPhoto } from './agent-photo';
 
 export const TEAMS     = ['Customer Support', 'Technical Support', 'Sales', 'Back Office', 'QA'];
 export const LOCATIONS = ['Addis Ababa', 'Nairobi', 'Lagos', 'Accra', 'Kampala', 'Dar es Salaam'];
@@ -32,8 +33,9 @@ function makeAgent(i: number): NetworkAgent {
   const spark = (base: number, amp: number, n = 24) =>
     Array.from({ length: n }, (_, k) => Math.max(0, base + Math.sin(k / 3) * amp + (mulberry32(i * k + 99)() - 0.5) * amp));
 
+  const id = `AGENT-${String(i + 1).padStart(3, '0')}`;
   return {
-    id:          `AGENT-${String(i + 1).padStart(3, '0')}`,
+    id,
     name:        NAMES[i % NAMES.length],
     team:        TEAMS[Math.floor(rand() * TEAMS.length)],
     location:    LOCATIONS[ispIdx % LOCATIONS.length],
@@ -57,11 +59,58 @@ function makeAgent(i: number): NetworkAgent {
     sparkLatency:spark(latency, 50),
     shift:       SHIFTS[Math.floor(rand() * SHIFTS.length)],
     online:      rand() > 0.15,
-    avatar:      `hsl(${Math.floor(rand() * 360)}, 60%, 55%)`,
+    avatar:      getAgentPhoto(id, 96),
   };
 }
 
-export const NET_AGENTS: NetworkAgent[] = Array.from({ length: 20 }, (_, i) => makeAgent(i));
+const REAL_AGENTS: NetworkAgent[] = [
+  {
+    id: 'AD-3001', name: 'Bezawit Berhanu', team: 'Sales', location: 'Addis Ababa',
+    isp: 'Ethio Telecom', ip: '196.188.120.44', vpn: false,
+    areaMaxDown: 50, areaMaxUp: 15, ispCapacity: 52, planDown: 50, planUp: 15,
+    download: 24.6, upload: 8.2, latency: 72, loss: 0.0, jitter: 8,
+    status: 'healthy', lastSeen: 2, online: true,
+    sparkDown: Array.from({ length: 24 }, (_, i) => 22 + Math.sin(i / 3) * 3),
+    sparkUp: Array.from({ length: 24 }, (_, i) => 7.8 + Math.sin(i / 4) * 1),
+    sparkLatency: Array.from({ length: 24 }, (_, i) => 70 + Math.sin(i / 2) * 10),
+    shift: '14:00–22:00', avatar: '/agents/bezawit-berhanu.png',
+  },
+  {
+    id: 'AD-3002', name: 'Nahom Dereje', team: 'Sales', location: 'Addis Ababa',
+    isp: 'Ethio Telecom', ip: '196.188.100.21', vpn: false,
+    areaMaxDown: 50, areaMaxUp: 15, ispCapacity: 58, planDown: 50, planUp: 15,
+    download: 28.4, upload: 9.6, latency: 88, loss: 0.0, jitter: 12,
+    status: 'healthy', lastSeen: 1, online: true,
+    sparkDown: Array.from({ length: 24 }, (_, i) => 26 + Math.sin(i / 3.5) * 4),
+    sparkUp: Array.from({ length: 24 }, (_, i) => 9.2 + Math.sin(i / 4) * 1.2),
+    sparkLatency: Array.from({ length: 24 }, (_, i) => 85 + Math.sin(i / 2.5) * 14),
+    shift: '22:00–06:00', avatar: '/agents/nahom-dereje.jpg',
+  },
+  {
+    id: 'AD-3003', name: 'Ermias Lemma', team: 'Sales', location: 'Addis Ababa',
+    isp: 'Ethio Telecom', ip: '196.188.77.110', vpn: true,
+    areaMaxDown: 100, areaMaxUp: 20, ispCapacity: 44, planDown: 100, planUp: 20,
+    download: 41.2, upload: 14.8, latency: 56, loss: 0.0, jitter: 6,
+    status: 'healthy', lastSeen: 0, online: true,
+    sparkDown: Array.from({ length: 24 }, (_, i) => 39 + Math.sin(i / 3) * 5),
+    sparkUp: Array.from({ length: 24 }, (_, i) => 14 + Math.sin(i / 3) * 1.5),
+    sparkLatency: Array.from({ length: 24 }, (_, i) => 54 + Math.sin(i / 2) * 8),
+    shift: '22:00–06:00', avatar: '/agents/ermias-lemma.png',
+  },
+  {
+    id: 'AD-3004', name: 'Tensae Wubeshet', team: 'Sales', location: 'Addis Ababa',
+    isp: 'Ethio Telecom', ip: '196.188.93.55', vpn: false,
+    areaMaxDown: 20, areaMaxUp: 10, ispCapacity: 61, planDown: 20, planUp: 10,
+    download: 18.8, upload: 6.4, latency: 104, loss: 0.1, jitter: 15,
+    status: 'healthy', lastSeen: 3, online: true,
+    sparkDown: Array.from({ length: 24 }, (_, i) => 17 + Math.sin(i / 4) * 3),
+    sparkUp: Array.from({ length: 24 }, (_, i) => 6 + Math.sin(i / 3) * 1),
+    sparkLatency: Array.from({ length: 24 }, (_, i) => 100 + Math.sin(i / 2) * 18),
+    shift: '14:00–22:00', avatar: '/agents/tensae-wubeshet.jpg',
+  },
+];
+
+export const NET_AGENTS: NetworkAgent[] = [...REAL_AGENTS, ...Array.from({ length: 20 }, (_, i) => makeAgent(i))];
 
 export function genHistory(agentId: string): HistoryRow[] {
   const agent = NET_AGENTS.find(a => a.id === agentId) ?? NET_AGENTS[0];

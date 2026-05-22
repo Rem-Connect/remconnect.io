@@ -66,6 +66,20 @@ export function AppSidebar() {
               {group.group}
             </div>
             {items.map((it) => {
+              if (it.isHeader) {
+                return (
+                  <div key={it.id} style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '6px 10px 2px',
+                    fontSize: 12, fontWeight: 600, color: '#2a2f3c',
+                    marginTop: 2,
+                  }}>
+                    <Icon name={it.icon} size={13} color="#5a6072" />
+                    <span>{it.label}</span>
+                  </div>
+                )
+              }
+
               const active = isActive(it.id)
               const href = ROUTE_MAP[it.id] ?? `/${it.id}`
               return (
@@ -76,9 +90,9 @@ export function AppSidebar() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 10,
-                    padding: '7px 10px',
+                    padding: it.indent ? '5px 10px 5px 26px' : '7px 10px',
                     borderRadius: 6,
-                    fontSize: 13,
+                    fontSize: it.indent ? 12 : 13,
                     color: active ? '#fff' : '#2a2f3c',
                     background: active ? '#0b1220' : 'transparent',
                     fontWeight: active ? 500 : 400,
@@ -90,7 +104,7 @@ export function AppSidebar() {
                   onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = '#f3f1ea' }}
                   onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                 >
-                  <Icon name={it.icon} size={15} color={active ? '#fff' : '#5a6072'} />
+                  <Icon name={it.icon} size={it.indent ? 13 : 15} color={active ? '#fff' : '#5a6072'} />
                   <span style={{ flex: 1 }}>{it.label}</span>
                   {it.badge && (
                     <span style={{
