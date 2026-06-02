@@ -55,10 +55,29 @@ export interface SampleAgent {
   photo?: string
 }
 
+export interface AgentIntake {
+  experience?: string
+  availability?: string
+  employed?: string
+  lateHours?: string
+  device?: string
+  phoneModel?: string
+  internet?: string
+  desiredSalary?: string
+  freelance?: string
+  cvUrl?: string
+}
+
 export interface AgentProfileExtras {
   headline: string
   photo?: string
   video?: string
+  /** voca.ro recording id, e.g. "1g9Su6PRq1wg" — rendered as a Vocaroo embed */
+  vocaroo?: string
+  /** Non-Vocaroo intro recording link (Loom, Drive, etc.) — rendered as a link */
+  introUrl?: string
+  /** Real candidate-intake answers from the SDR application form */
+  intake?: AgentIntake
   pitch: string
   location: string
   timezone: string

@@ -1,151 +1,53 @@
 'use client'
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { FAQS } from '@/lib/landing-data'
-import { useInView } from './useLandingHooks'
 
-function FAQItem({
-  q, a, open, onToggle,
-}: { q: string; a: string; open: boolean; onToggle: () => void }) {
+const EASE = [0.16, 1, 0.3, 1] as const
+
+function FAQItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
   return (
-    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-      <button
-        onClick={onToggle}
-        style={{
-          width: '100%', display: 'flex',
-          justifyContent: 'space-between', alignItems: 'flex-start',
-          padding: '24px 0', background: 'none', border: 'none',
-          cursor: 'pointer', gap: '24px', textAlign: 'left',
-        }}
-      >
-        <span style={{
-          fontWeight: 600, fontSize: '15px',
-          color: open ? 'var(--rc-paper)' : 'var(--rc-muted-d)',
-          lineHeight: 1.45, transition: 'color 0.2s',
-          fontFamily: 'var(--font-family-sans)',
-        }}>
+    <div style={{ borderBottom: '1px solid var(--l-line)' }}>
+      <button onClick={onToggle}
+        style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '24px 0', background: 'none', border: 'none', cursor: 'pointer', gap: 24, textAlign: 'left' }}>
+        <span style={{ fontWeight: 600, fontSize: 16, color: open ? 'var(--l-ink)' : 'var(--l-body)', lineHeight: 1.4, transition: 'color 0.2s', fontFamily: 'var(--font-family-display)', letterSpacing: '-0.01em' }}>
           {q}
         </span>
-        <span style={{
-          width: '22px', height: '22px', flexShrink: 0, marginTop: '1px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '50%',
-          border: `1px solid ${open ? 'var(--rc-blue)' : 'rgba(255,255,255,0.14)'}`,
-          color: open ? 'var(--rc-blue)' : 'var(--rc-muted-d)',
-          fontSize: '16px', lineHeight: 1,
-          transition: 'border-color 0.2s, color 0.2s, transform 0.25s',
-          transform: open ? 'rotate(45deg)' : 'rotate(0deg)',
-        }}>
+        <motion.span animate={{ rotate: open ? 45 : 0, backgroundColor: open ? 'var(--l-blue)' : 'transparent' }} transition={{ duration: 0.25, ease: EASE }}
+          style={{ width: 26, height: 26, flexShrink: 0, marginTop: 1, display: 'grid', placeItems: 'center', borderRadius: '50%', border: `1px solid ${open ? 'var(--l-blue)' : 'var(--l-line-2)'}`, color: open ? '#fff' : 'var(--l-body)', fontSize: 17, lineHeight: 1, transition: 'border-color 0.2s, color 0.2s' }}>
           +
-        </span>
+        </motion.span>
       </button>
-
-      <div style={{
-        maxHeight: open ? '600px' : '0',
-        overflow: 'hidden',
-        transition: 'max-height 0.35s cubic-bezier(0.16,1,0.3,1)',
-      }}>
-        <p style={{
-          fontSize: '14px', lineHeight: 1.75,
-          color: 'var(--rc-muted-d)',
-          padding: '0 48px 24px 0',
-          margin: 0,
-        }}>
-          {a}
-        </p>
-      </div>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.32, ease: EASE }} style={{ overflow: 'hidden' }}>
+            <p style={{ fontSize: 14.5, lineHeight: 1.72, color: 'var(--l-body)', padding: '0 48px 24px 0', margin: 0 }}>{a}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
 
 export default function FAQ() {
-  const { ref, visible } = useInView()
   const [openIdx, setOpenIdx] = useState<number | null>(0)
-
   return (
-    <section
-      id="faq"
-      ref={ref}
-      className="l-section-pad"
-      style={{
-        background: 'var(--rc-ink-2)',
-        padding: '112px 48px',
-      }}
-    >
-      <div
-        className="l-faq-grid"
-        style={{
-          maxWidth: '1280px', margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: '300px 1fr',
-          gap: '88px',
-          alignItems: 'start',
-        }}
-      >
-        {/* Left sticky heading */}
-        <div style={{
-          position: 'sticky', top: '96px',
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(28px)',
-          transition: 'opacity 0.65s ease, transform 0.65s ease',
-        }}>
-          <p style={{
-            fontFamily: 'var(--font-family-mono)',
-            fontSize: '10px', letterSpacing: '0.15em',
-            color: 'var(--rc-blue)', textTransform: 'uppercase',
-            margin: '0 0 14px',
-          }}>
-            FAQ
-          </p>
-          <h2 style={{
-            fontFamily: 'var(--font-family-display)',
-            fontWeight: 800,
-            fontSize: 'clamp(1.9rem, 2.8vw, 2.6rem)',
-            color: 'var(--rc-paper)', letterSpacing: '-0.025em',
-            lineHeight: 1.1, margin: '0 0 16px',
-          }}>
-            Common<br />
-            <em style={{
-              fontFamily: 'var(--font-family-serif)',
-              fontStyle: 'italic', fontWeight: 400,
-              color: 'var(--rc-blue-soft)',
-            }}>questions</em>
+    <section id="faq" className="l-section-pad" style={{ background: 'var(--l-surface)', padding: '116px 48px', borderTop: '1px solid var(--l-line)', scrollMarginTop: 80 }}>
+      <div className="l-faq-grid" style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: '320px 1fr', gap: 88, alignItems: 'start' }}>
+        <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.6, ease: EASE }} style={{ position: 'sticky', top: 110 }}>
+          <p style={{ fontFamily: 'var(--font-family-sans)', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', color: 'var(--l-blue)', textTransform: 'uppercase', margin: '0 0 16px' }}>FAQ</p>
+          <h2 style={{ fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: 'clamp(2rem, 3vw, 2.8rem)', color: 'var(--l-ink)', letterSpacing: '-0.03em', lineHeight: 1.04, margin: '0 0 16px' }}>
+            Common <span style={{ color: 'var(--l-blue)' }}>questions</span>
           </h2>
-          <p style={{
-            fontSize: '14px', color: 'var(--rc-muted-d)',
-            lineHeight: 1.68, margin: '0 0 28px',
-          }}>
-            Everything you need to know about applying, working, and getting paid.
-          </p>
-          <a
-            href="mailto:bezamariam@remconnect.io"
-            style={{
-              fontSize: '13px', color: 'var(--rc-blue-soft)',
-              textDecoration: 'none',
-              paddingBottom: '1px',
-              borderBottom: '1px solid rgba(124,179,245,0.3)',
-              transition: 'color 0.15s',
-            }}
-          >
-            Still have questions? Email us →
-          </a>
-        </div>
+          <p style={{ fontSize: 14.5, color: 'var(--l-body)', lineHeight: 1.6, margin: '0 0 26px' }}>Everything about applying, working, and getting paid.</p>
+          <a href="mailto:bezamariam@remconnect.io" style={{ fontSize: 13.5, color: 'var(--l-blue)', fontWeight: 600, paddingBottom: 1, borderBottom: '1.5px solid rgba(29,111,214,0.3)' }}>Still have questions? Email us →</a>
+        </motion.div>
 
-        {/* Right: accordion */}
-        <div style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(28px)',
-          transition: 'opacity 0.65s ease 120ms, transform 0.65s ease 120ms',
-        }}>
+        <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.6, delay: 0.12, ease: EASE }}>
           {FAQS.map((faq, i) => (
-            <FAQItem
-              key={i}
-              q={faq.q}
-              a={faq.a}
-              open={openIdx === i}
-              onToggle={() => setOpenIdx(openIdx === i ? null : i)}
-            />
+            <FAQItem key={i} q={faq.q} a={faq.a} open={openIdx === i} onToggle={() => setOpenIdx(openIdx === i ? null : i)} />
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   )

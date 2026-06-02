@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* Landing-page type pairing (scoped to .landing-root) */
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700,900&display=swap');
 
 @import "tailwindcss";
 
@@ -70,6 +72,41 @@
   --rc-warn:      #c08a2a;
   --rc-bad:       #b54838;
 }
+
+/* ─── Landing page: scoped light theme + Clash Display / Satoshi pairing ─── */
+.landing-root {
+  /* Type: 2 families only — Clash Display (headings) + Satoshi (everything else) */
+  --font-family-display: "Clash Display", ui-sans-serif, system-ui, sans-serif;
+  --font-family-sans:    "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  --font-family-serif:   "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono:    "Satoshi", ui-sans-serif, system-ui, sans-serif;
+
+  /* Light surface ramp */
+  --l-bg:        #fbfaf7;  /* page base */
+  --l-surface:   #ffffff;  /* cards */
+  --l-surface-2: #f4f1ea; /* alt section */
+  --l-tint:      #eef4fc;  /* soft blue wash section */
+  --l-tint-2:    #e3edfb;
+  --l-line:      #e9e5da;  /* hairlines */
+  --l-line-2:    #dcd7c9;
+  --l-ink:       #14181f;  /* headings */
+  --l-body:      #565d6b;  /* body text */
+  --l-faint:     #8b91a0;  /* captions */
+  --l-blue:      #1d6fd6;
+  --l-blue-deep: #0b4fa8;
+
+  /* Tinted soft shadows (ink-hued, never pure black) */
+  --l-sh-sm: 0 1px 2px rgba(20,24,31,0.05), 0 1px 3px rgba(20,24,31,0.04);
+  --l-sh-md: 0 8px 24px rgba(20,24,31,0.07), 0 2px 6px rgba(20,24,31,0.05);
+  --l-sh-lg: 0 28px 60px rgba(20,24,31,0.12), 0 6px 16px rgba(20,24,31,0.06);
+  --l-sh-blue: 0 16px 40px rgba(29,111,214,0.28);
+
+  background: var(--l-bg);
+  color: var(--l-ink);
+  font-family: var(--font-family-sans);
+  font-feature-settings: "ss01", "cv01";
+}
+.landing-root ::selection { background: rgba(29,111,214,0.16); }
 
 * { box-sizing: border-box; }
 
@@ -208,6 +245,11 @@ a:focus-visible {
   from { transform: scaleX(0); transform-origin: left; }
   to   { transform: scaleX(1); transform-origin: left; }
 }
+@keyframes l-ripple {
+  0%   { transform: scale(1);   opacity: 0.5; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.l-ripple { animation: l-ripple 1.8s ease-out infinite; }
 
 .l-in       { animation: l-up    0.75s cubic-bezier(0.16,1,0.3,1) both; }
 .l-in-fade  { animation: l-fade  0.65s ease both; }
@@ -231,6 +273,7 @@ a:focus-visible {
 @media (max-width: 1024px) {
   .l-hero-grid     { grid-template-columns: 1fr !important; }
   .l-hero-videos   { display: none !important; }
+  .l-hero-visual   { display: none !important; }
   .l-dual-grid     { grid-template-columns: 1fr !important; }
   .l-how-grid      { grid-template-columns: 1fr !important; }
   .l-agent-grid    { grid-template-columns: 1fr 1fr !important; }
@@ -248,4 +291,34 @@ a:focus-visible {
   .l-footer-grid { grid-template-columns: 1fr !important; }
   .l-stats-grid  { grid-template-columns: 1fr 1fr !important; }
   .l-hero-pad    { padding: 96px 24px 72px !important; }
+  .l-roles-grid  { grid-template-columns: 1fr !important; }
+  .l-split-grid  { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 1024px) {
+  .l-roles-grid  { grid-template-columns: 1fr 1fr !important; }
+  .l-split-grid  { grid-template-columns: 1fr !important; }
+  .l-legit-grid  { grid-template-columns: 1fr !important; }
+  .l-stories-grid{ grid-template-columns: 1fr !important; }
+  .l-req-grid    { grid-template-columns: 1fr !important; }
+  .l-timeline    { grid-template-columns: 1fr !important; }
+  .l-timeline .l-timeline-bar { display: none !important; }
+}
+
+/* Landing nav: collapse to hamburger below 900px */
+.l-mobile-menu-btn { display: none; }
+@media (max-width: 900px) {
+  .l-nav-desktop     { display: none !important; }
+  .l-mobile-menu-btn { display: flex !important; align-items: center; }
+}
+
+/* Respect reduced-motion: kill perpetual loops + marquees */
+@media (prefers-reduced-motion: reduce) {
+  .l-float,
+  .l-marquee,
+  .l-scroll-cue,
+  .l-ripple,
+  .rc-pulse,
+  .l-spin { animation: none !important; }
+  html { scroll-behavior: auto; }
 }

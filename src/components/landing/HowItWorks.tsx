@@ -1,144 +1,52 @@
 'use client'
+import { motion } from 'motion/react'
 import { STEPS } from '@/lib/landing-data'
-import { useInView } from './useLandingHooks'
+
+const EASE = [0.16, 1, 0.3, 1] as const
 
 export default function HowItWorks() {
-  const { ref, visible } = useInView()
   return (
-    <section
-      ref={ref}
-      className="l-section-pad"
-      style={{
-        background: 'var(--rc-paper)',
-        padding: '112px 48px',
-      }}
-    >
-      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-        <div style={{ marginBottom: '80px' }}>
-          <p style={{
-            fontFamily: 'var(--font-family-mono)',
-            fontSize: '10px', letterSpacing: '0.15em',
-            color: 'var(--rc-blue)', textTransform: 'uppercase',
-            margin: '0 0 14px',
-          }}>
+    <section id="how" className="l-section-pad" style={{ background: 'var(--l-bg)', padding: '116px 48px', scrollMarginTop: 80 }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto' }}>
+        <motion.div initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.65, ease: EASE }} style={{ marginBottom: 72, maxWidth: 560 }}>
+          <p style={{ fontFamily: 'var(--font-family-sans)', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', color: 'var(--l-blue)', textTransform: 'uppercase', margin: '0 0 16px' }}>
             How it works
           </p>
-          <h2 style={{
-            fontFamily: 'var(--font-family-display)',
-            fontWeight: 800,
-            fontSize: 'clamp(2rem, 3.6vw, 3.2rem)',
-            color: 'var(--rc-ink)', letterSpacing: '-0.025em',
-            lineHeight: 1.08, margin: 0,
-          }}>
-            Three steps to your<br />
-            <em style={{
-              fontFamily: 'var(--font-family-serif)',
-              fontStyle: 'italic', fontWeight: 400,
-            }}>next opportunity</em>
+          <h2 style={{ fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: 'clamp(2.2rem, 4vw, 3.4rem)', color: 'var(--l-ink)', letterSpacing: '-0.03em', lineHeight: 1.02, margin: '0 0 18px' }}>
+            Three steps to your next opportunity
           </h2>
-        </div>
+          <p style={{ fontSize: 15.5, lineHeight: 1.6, color: 'var(--l-body)', margin: 0 }}>
+            A clear, human process with no guesswork. Here is exactly what happens after you apply.
+          </p>
+        </motion.div>
 
-        <div
-          className="l-how-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '2px',
-          }}
-        >
+        <div className="l-timeline" style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+          <motion.div className="l-timeline-bar"
+            initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 1, ease: EASE, delay: 0.2 }}
+            style={{ position: 'absolute', top: 27, left: '16%', right: '16%', height: 2, background: 'linear-gradient(to right, var(--l-blue), rgba(29,111,214,0.25))', transformOrigin: 'left', borderRadius: 2, zIndex: 0 }} />
+
           {STEPS.map((step, i) => (
-            <div
-              key={step.id}
-              style={{
-                position: 'relative',
-                padding: '52px 44px',
-                background: i === 1 ? 'var(--rc-ink)' : i === 0 ? 'var(--rc-paper-2)' : 'var(--rc-paper-3)',
-                border: '1px solid var(--rc-line)',
-                borderRadius: i === 0 ? '16px 0 0 16px' : i === 2 ? '0 16px 16px 0' : '0',
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(40px)',
-                transition: `opacity 0.7s ease ${i * 130}ms, transform 0.7s ease ${i * 130}ms`,
-              }}
-            >
-              {/* Large ghost number */}
+            <motion.div key={step.id}
+              initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.15 + i * 0.18, ease: EASE }}
+              style={{ position: 'relative', zIndex: 1 }}>
               <div style={{
-                fontFamily: 'var(--font-family-display)',
-                fontSize: '5.5rem', fontWeight: 800,
-                lineHeight: 1, marginBottom: '28px',
-                letterSpacing: '-0.04em',
-                color: i === 1 ? 'rgba(255,255,255,0.05)' : 'rgba(11,18,32,0.05)',
-                userSelect: 'none',
+                width: 56, height: 56, borderRadius: 16, marginBottom: 24,
+                display: 'grid', placeItems: 'center', background: 'var(--l-surface)', color: 'var(--l-blue)',
+                fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: '1.4rem',
+                boxShadow: 'var(--l-sh-md)', border: '1px solid var(--l-line)',
               }}>
-                0{step.n}
+                {step.n}
               </div>
-
-              {/* Blue accent line */}
-              <div style={{
-                width: '28px', height: '2px',
-                background: 'var(--rc-blue)',
-                borderRadius: '2px',
-                marginBottom: '20px',
-                transform: visible ? 'scaleX(1)' : 'scaleX(0)',
-                transformOrigin: 'left',
-                transition: `transform 0.5s ease ${200 + i * 130}ms`,
-              }} />
-
-              <h3 style={{
-                fontFamily: 'var(--font-family-display)',
-                fontWeight: 700, fontSize: '1.2rem',
-                letterSpacing: '-0.01em',
-                color: i === 1 ? 'var(--rc-paper)' : 'var(--rc-ink)',
-                margin: '0 0 12px',
-              }}>
+              <h3 style={{ fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: '1.45rem', color: 'var(--l-ink)', letterSpacing: '-0.02em', margin: '0 0 12px' }}>
                 {step.title}
               </h3>
-              <p style={{
-                fontSize: '14px', lineHeight: 1.68,
-                color: i === 1 ? 'var(--rc-muted-d)' : 'var(--rc-muted)',
-                margin: 0,
-              }}>
+              <p style={{ fontSize: 14.5, lineHeight: 1.65, color: 'var(--l-body)', margin: 0, maxWidth: 320 }}>
                 {step.body}
               </p>
-
-              {/* Connector dot */}
-              {i < 2 && (
-                <div style={{
-                  position: 'absolute', right: '-12px', top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '24px', height: '24px', borderRadius: '50%',
-                  background: 'var(--rc-paper)',
-                  border: '1px solid var(--rc-line)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  zIndex: 2, fontSize: '12px', color: 'var(--rc-muted)',
-                }}>
-                  →
-                </div>
-              )}
-            </div>
+            </motion.div>
           ))}
-        </div>
-
-        <div style={{ marginTop: '56px', textAlign: 'center' }}>
-          <a
-            href="/apply"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '10px',
-              background: 'var(--rc-ink)', color: '#fff',
-              padding: '14px 32px', borderRadius: '8px',
-              fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-              transition: 'transform 0.18s, box-shadow 0.18s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = '0 8px 24px rgba(11,18,32,0.2)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = 'none'
-            }}
-          >
-            Start your application →
-          </a>
         </div>
       </div>
     </section>

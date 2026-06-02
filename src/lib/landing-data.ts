@@ -91,7 +91,7 @@ export const STEPS: Step[] = [
     id: 'match',
     n: 2,
     title: 'Match & interview',
-    body: 'Wait for an email from a RemConnect representative with next steps — timing varies by role.',
+    body: 'Wait for an email from a RemConnect representative with next steps. Timing varies by role.',
   },
   {
     id: 'hired',
@@ -118,7 +118,7 @@ export const FEATURED_JOBS: Job[] = [
     location: 'Remote',
     salaryRange: '30,000 – 45,000 ETB',
     blurb:
-      'Own customer relationships end-to-end for a fast-growing global SaaS partner — onboarding, retention, expansion.',
+      'Own customer relationships end-to-end for a fast-growing global SaaS partner across onboarding, retention, and expansion.',
   },
   {
     id: 'ai-ops',
@@ -164,7 +164,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Are certifications and degrees required for every position? Do we need prior experience to get hired?",
-    a: "No — certifications and/or degrees can help boost your profile but won't definitively determine hiring status. Experience can also aid the process but lack of experience won't deter it. Above all, complete your profile to the best of your ability so we can make the best decision for your fit.",
+    a: "No. Certifications and/or degrees can help boost your profile but won't definitively determine hiring status. Experience can also aid the process but lack of experience won't deter it. Above all, complete your profile to the best of your ability so we can make the best decision for your fit.",
   },
   {
     q: "Do candidates pay to apply for jobs?",
@@ -180,7 +180,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Is a LinkedIn account necessary for applying?",
-    a: "Yes — a LinkedIn account is absolutely necessary. It shows us, among many things, your level of professionalism, expertise, experience, and education.",
+    a: "Yes. A LinkedIn account is absolutely necessary. It shows us, among many things, your level of professionalism, expertise, experience, and education.",
   },
   {
     q: "Do we sign a contract? If so, how long is the term?",
@@ -207,4 +207,194 @@ export const FAQS: Faq[] = [
 export const VIDEO_YOUTUBE_ID = '_qiaxTnIarg'
 
 export const APPLY_HREF = '/apply'
+
+// RemConnect runs a separate site for employers; this is the only outbound nod.
+export const EMPLOYERS_HREF = 'https://remconnect.io/employers' // TODO: confirm client-site URL
+
+/* ─── Candidate-facing data (homepage rebuild) ───────────────────── */
+
+// ── Trust / stats bar ──
+export type Stat = { value: number; prefix?: string; suffix?: string; label: string }
+
+// TODO: confirm — representative figures, replace with real metrics before launch.
+export const STATS: Stat[] = [
+  { value: 100, suffix: '+', label: 'Professionals placed' },
+  { value: 15, suffix: '+', label: 'Companies hiring' },
+  { value: 6, prefix: '2–', suffix: ' wks', label: 'Avg. time to placement' },
+  { value: 0, suffix: '', label: 'Fees, ever' },
+]
+
+// ── Role categories + salary bands ("is this for me?") ──
+export type RoleCategory = {
+  id: string
+  name: string
+  icon: string
+  salaryBand: string
+  examples: string[]
+}
+
+// Bands anchored to existing job ranges where available; others marked.
+export const ROLE_CATEGORIES: RoleCategory[] = [
+  {
+    id: 'support',
+    name: 'Customer Support',
+    icon: 'headset',
+    salaryBand: '30,000 – 45,000 ETB',
+    examples: ['Customer Success', 'Technical Support', 'Live Chat & Email'],
+  },
+  {
+    id: 'engineering',
+    name: 'Software & Engineering',
+    icon: 'code',
+    salaryBand: '40,000 – 60,000 ETB',
+    examples: ['Full Stack Developer', 'Frontend Engineer', 'QA Engineer'],
+  },
+  {
+    id: 'ai-data',
+    name: 'AI & Data Operations',
+    icon: 'spark',
+    salaryBand: '35,000 – 50,000 ETB', // TODO: confirm
+    examples: ['AI Operations Analyst', 'Data Annotation', 'Prompt Evaluation'],
+  },
+  {
+    id: 'admin',
+    name: 'Admin & Virtual Assistance',
+    icon: 'clipboard',
+    salaryBand: '25,000 – 38,000 ETB', // TODO: confirm
+    examples: ['Executive Assistant', 'Operations Coordinator', 'Scheduling'],
+  },
+  {
+    id: 'sales',
+    name: 'Sales & Outreach',
+    icon: 'megaphone',
+    salaryBand: '28,000 – 48,000 ETB', // TODO: confirm (+ commission)
+    examples: ['SDR / Lead Gen', 'Account Management', 'Appointment Setting'],
+  },
+  {
+    id: 'finance',
+    name: 'Finance & Bookkeeping',
+    icon: 'wallet',
+    salaryBand: '32,000 – 50,000 ETB', // TODO: confirm
+    examples: ['Bookkeeper', 'Accounts Payable', 'Financial Analyst'],
+  },
+]
+
+// ── What you get (candidate benefits) ──
+export type Benefit = { id: string; icon: string; title: string; body: string }
+
+export const BENEFITS: Benefit[] = [
+  {
+    id: 'training',
+    icon: 'spark',
+    title: 'Training, fully provided',
+    body: 'Roles include 2–6 weeks of virtual training run by the client, so you start prepared, not thrown in.',
+  },
+  {
+    id: 'pay',
+    icon: 'wallet',
+    title: 'Paid to your own bank',
+    body: 'Payments go to your preferred bank with a detailed stub: term length, amount, and any bonus or commission.',
+  },
+  {
+    id: 'currency',
+    icon: 'globe',
+    title: 'Clarity on currency',
+    body: 'Currency varies by opportunity and is spelled out before you sign. No surprises, no hidden math.',
+  },
+  {
+    id: 'support',
+    icon: 'headset',
+    title: 'Support that stays',
+    body: 'From intake to onboarding and beyond, a RemConnect representative stays with you through the whole journey.',
+  },
+  {
+    id: 'contract',
+    icon: 'shield',
+    title: 'A real, written contract',
+    body: 'Every placement comes with a formal contract and clear terms composed before training begins.',
+  },
+]
+
+// ── Requirements checklist (self-qualification) ──
+export type Requirement = { label: string; detail: string }
+
+export const REQUIREMENTS: Requirement[] = [
+  { label: 'You are 18 or older', detail: 'All candidates on the platform must be at least 18 years old.' },
+  { label: 'A LinkedIn account', detail: 'Required. It shows us your professionalism, experience, and education at a glance.' },
+  { label: 'Working English', detail: 'Comfortable communicating with global teams in written and spoken English.' },
+  { label: 'Your documents ready', detail: 'CV and supporting documents uploaded in your portal so we can match you faster.' },
+  { label: 'A complete profile', detail: 'No degree required, but the fuller your profile, the better we can place you.' },
+]
+
+// ── Legitimacy: what we will / will never do ──
+export const LEGIT_WILL: string[] = [
+  'Match you to roles completely free of charge',
+  'Pay you directly to your chosen bank account',
+  'Put every offer in a written contract before training',
+  'Provide virtual training run by the hiring company',
+  'Give you next steps through your portal and our team',
+]
+
+export const LEGIT_WONT: string[] = [
+  'Ask you to pay a fee for any reason, ever',
+  'Recruit you through random DMs or unofficial accounts',
+  'Promise a guaranteed job without a real process',
+  'Request payment for training, equipment, or placement',
+  'Ask for sensitive details outside your secure portal',
+]
+
+// ── Success stories (real placed professionals) ──
+// TODO: confirm consent + replace with each person's real quote and outcome.
+export type SuccessStory = {
+  id: string
+  img: string
+  name: string
+  role: string
+  placedAt: string
+  quote: string
+  outcome: string
+}
+
+export const SUCCESS_STORIES: SuccessStory[] = [
+  {
+    id: 'ermias',
+    img: '/agents/ermias-lemma.png',
+    name: 'Ermias Lemma',
+    role: 'Full Stack Developer',
+    placedAt: 'Global SaaS company',
+    outcome: 'Placed remotely',
+    quote:
+      'I was struggling to find work in my field. Through RemConnect I found the perfect opportunity. The process was clear and they stayed with me the whole way.',
+  },
+  {
+    id: 'nahom',
+    img: '/agents/nahom-dereje.jpg',
+    name: 'Nahom Dereje',
+    role: 'Customer Success Specialist',
+    placedAt: 'US tech startup',
+    outcome: 'Placed remotely',
+    quote:
+      'RemConnect helped me land a role with a company abroad. Applying was simple, and the training meant I started genuinely ready.',
+  },
+  {
+    id: 'tensae',
+    img: '/agents/tensae-wubeshet.jpg',
+    name: 'Tensae Wubeshet',
+    role: 'AI Operations Analyst',
+    placedAt: 'AI product team',
+    outcome: 'Placed remotely',
+    quote:
+      'From application to onboarding everything was handled. I now work on AI quality benchmarks for a team I never could have reached on my own.',
+  },
+  {
+    id: 'bezawit',
+    img: '/agents/bezawit-berhanu.png',
+    name: 'Bezawit Berhanu',
+    role: 'Operations Coordinator',
+    placedAt: 'International agency',
+    outcome: 'Placed remotely',
+    quote:
+      'The platform made the search easy and the wage is genuinely livable. I would recommend RemConnect to anyone looking for remote work.',
+  },
+]
 

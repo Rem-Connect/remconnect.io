@@ -193,6 +193,49 @@ export function AgentAdminProfile({ agentId }: Props) {
                 )}
               </Card>
 
+              {/* Intro recording — video, else Vocaroo audio, else external link */}
+              {(extras.video || extras.vocaroo || extras.introUrl) && (
+                <Card>
+                  <SectionTitle>{extras.video ? 'Intro video' : 'Intro recording'}</SectionTitle>
+                  {extras.video ? (
+                    <video
+                      src={extras.video}
+                      controls
+                      preload="metadata"
+                      style={{ width: '100%', borderRadius: 8, display: 'block', background: '#000', maxHeight: 360 }}
+                    />
+                  ) : extras.vocaroo ? (
+                    <>
+                      <iframe
+                        title={`${agent.name} — intro recording`}
+                        width="100%"
+                        height={60}
+                        src={`https://vocaroo.com/embed/${extras.vocaroo}?autoplay=0`}
+                        allow="autoplay"
+                        style={{ border: 0, borderRadius: 8, display: 'block' }}
+                      />
+                      <a
+                        href={`https://voca.ro/${extras.vocaroo}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 10, fontSize: 12, color: '#1d6fd6', fontWeight: 600 }}
+                      >
+                        View on Vocaroo <Icon name="arrow-up-right" size={12} color="#1d6fd6" />
+                      </a>
+                    </>
+                  ) : (
+                    <a
+                      href={extras.introUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 13px', borderRadius: 7, border: '1px solid #e3e0d2', fontSize: 12.5, color: '#1d6fd6', fontWeight: 600 }}
+                    >
+                      <Icon name="play-circle" size={14} color="#1d6fd6" /> Listen to intro recording
+                    </a>
+                  )}
+                </Card>
+              )}
+
               {/* Quick stats */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                 <StatBox label="Experience" value={`${agent.years}y`} sub="total" />
@@ -246,6 +289,40 @@ export function AgentAdminProfile({ agentId }: Props) {
                     ))}
                   </div>
                 </Card>
+
+                {extras.intake && (
+                  <Card>
+                    <SectionTitle>Candidate intake</SectionTitle>
+                    <div style={{ display: 'grid', gap: 11 }}>
+                      {([
+                        { label: 'Desired salary', value: extras.intake.desiredSalary },
+                        { label: 'Availability', value: extras.intake.availability },
+                        { label: 'Prior experience', value: extras.intake.experience },
+                        { label: 'Currently employed', value: extras.intake.employed },
+                        { label: 'Late-hours OK', value: extras.intake.lateHours },
+                        { label: 'Computer', value: extras.intake.device },
+                        { label: 'Phone', value: extras.intake.phoneModel },
+                        { label: 'Internet', value: extras.intake.internet },
+                        { label: 'Freelance', value: extras.intake.freelance },
+                      ].filter(r => r.value)).map(r => (
+                        <div key={r.label} style={{ display: 'flex', gap: 10, fontSize: 12.5, alignItems: 'flex-start' }}>
+                          <span style={{ width: 108, flexShrink: 0, color: '#8b93a7' }}>{r.label}</span>
+                          <span style={{ color: '#3a3f52', lineHeight: 1.4 }}>{r.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {extras.intake.cvUrl && (
+                      <a
+                        href={extras.intake.cvUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 14, padding: '8px 12px', borderRadius: 7, border: '1px solid #e3e0d2', fontSize: 12, color: '#0b1220', fontWeight: 600 }}
+                      >
+                        <Icon name="document" size={13} color="#5a6072" /> View CV / résumé
+                      </a>
+                    )}
+                  </Card>
+                )}
 
                 {extras.notes.length > 0 && (
                   <Card>

@@ -1,36 +1,43 @@
 import type { Metadata } from 'next'
 import LandingNav from '@/components/landing/LandingNav'
 import Hero from '@/components/landing/Hero'
+import RoleMarquee from '@/components/landing/RoleMarquee'
 import StatsBar from '@/components/landing/StatsBar'
-import DualAudience from '@/components/landing/DualAudience'
+import RoleSalaries from '@/components/landing/RoleSalaries'
 import HowItWorks from '@/components/landing/HowItWorks'
-import AgentShowcase from '@/components/landing/AgentShowcase'
-import FeaturedJobs from '@/components/landing/FeaturedJobs'
-import Testimonials from '@/components/landing/Testimonials'
-import Mission from '@/components/landing/Mission'
+import OpenRoles from '@/components/landing/OpenRoles'
+import WhatYouGet from '@/components/landing/WhatYouGet'
+import VideoWalkthrough from '@/components/landing/VideoWalkthrough'
+import SuccessStories from '@/components/landing/SuccessStories'
+import Legitimacy from '@/components/landing/Legitimacy'
+import Requirements from '@/components/landing/Requirements'
 import FAQ from '@/components/landing/FAQ'
-import SplitCTA from '@/components/landing/SplitCTA'
+import FinalCTA from '@/components/landing/FinalCTA'
 import LandingFooter from '@/components/landing/LandingFooter'
 
 export const metadata: Metadata = {
-  title: 'RemConnect — Premiere Talent, Global Opportunities',
-  description: "Connecting Ethiopia's top professionals to remote work with companies around the world.",
+  title: 'RemConnect — Remote work for Ethiopian professionals',
+  description:
+    "Apply free to remote roles with companies around the world. RemConnect connects Ethiopia's top professionals to global opportunities — vetted, fair, and fee-free.",
 }
 
 export default function LandingPage() {
   return (
-    <main style={{ overflowX: 'hidden', width: '100%', maxWidth: '100%' }}>
+    <main className="landing-root" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100%' }}>
       <LandingNav />
       <Hero />
+      <RoleMarquee />
       <StatsBar />
-      <DualAudience />
+      <RoleSalaries />
       <HowItWorks />
-      <AgentShowcase />
-      <FeaturedJobs />
-      <Testimonials />
-      <Mission />
+      <OpenRoles />
+      <WhatYouGet />
+      <VideoWalkthrough />
+      <SuccessStories />
+      <Legitimacy />
+      <Requirements />
       <FAQ />
-      <SplitCTA />
+      <FinalCTA />
       <LandingFooter />
     </main>
   )
