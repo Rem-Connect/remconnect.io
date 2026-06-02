@@ -1,53 +1,93 @@
-'use client'
-import { motion } from 'motion/react'
-import { REQUIREMENTS, APPLY_HREF } from '@/lib/landing-data'
-
-const EASE = [0.16, 1, 0.3, 1] as const
-
-function TickBox() {
+function Check() {
   return (
-    <motion.span initial={{ scale: 0.6 }} whileInView={{ scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, ease: EASE }}
-      style={{ width: 30, height: 30, borderRadius: 9, flexShrink: 0, display: 'grid', placeItems: 'center', background: 'var(--l-blue)', boxShadow: '0 4px 12px rgba(29,111,214,0.3)' }}>
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-        <motion.path d="M6 12.5l3.5 3.5L18 7.5" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
-          initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.15, ease: EASE }} />
-      </svg>
-    </motion.span>
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
   )
 }
 
 export default function Requirements() {
   return (
-    <section className="l-section-pad" style={{ background: 'var(--l-bg)', padding: '116px 48px' }}>
-      <div style={{ maxWidth: 1040, margin: '0 auto' }}>
-        <motion.div initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.65, ease: EASE }}
-          style={{ textAlign: 'center', maxWidth: 580, margin: '0 auto 52px' }}>
-          <h2 style={{ fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: 'clamp(2.1rem, 3.6vw, 3.1rem)', color: 'var(--l-ink)', letterSpacing: '-0.03em', lineHeight: 1.04, margin: '0 0 14px' }}>
-            Before you apply, a quick check
+    <section className="lp-section" id="requirements" data-screen-label="Requirements">
+      <div className="lp-reqs">
+        <div>
+          <div className="lp-index reveal">
+            <span>05</span>
+            <span className="ln" />
+            <b>Before you apply</b>
+          </div>
+          <h2 className="lp-h2 reveal d1" style={{ fontSize: 'clamp(34px,4.2vw,52px)' }}>
+            What you&apos;ll need to get started.
           </h2>
-          <p style={{ fontSize: 15.5, lineHeight: 1.6, color: 'var(--l-body)', margin: 0 }}>
-            Most candidates qualify. Tick off what applies, then start your profile.
+          <p className="lp-lede reveal d2" style={{ marginTop: '18px' }}>
+            A short checklist. Don&apos;t tick every box yet? Apply anyway — we review every profile, and some gaps we
+            help you close during training.
           </p>
-        </motion.div>
-
-        <div className="l-req-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 40px', marginBottom: 48 }}>
-          {REQUIREMENTS.map((req, i) => (
-            <motion.div key={req.label} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.5, delay: i * 0.08, ease: EASE }}
-              style={{ display: 'flex', gap: 16, alignItems: 'flex-start', padding: '24px 26px', borderRadius: 16, background: 'var(--l-surface)', border: '1px solid var(--l-line)', boxShadow: 'var(--l-sh-sm)' }}>
-              <TickBox />
-              <div>
-                <h3 style={{ fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: '1.1rem', color: 'var(--l-ink)', margin: '0 0 4px', letterSpacing: '-0.015em' }}>{req.label}</h3>
-                <p style={{ fontSize: 13.5, lineHeight: 1.55, color: 'var(--l-body)', margin: 0 }}>{req.detail}</p>
-              </div>
-            </motion.div>
-          ))}
+          <button className="lp-btn lp-btn-dark reveal d3" style={{ marginTop: '28px' }}>
+            Start my application
+            <span className="pip">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                <path d="M5 12h14M13 5l7 7-7 7" />
+              </svg>
+            </span>
+          </button>
         </div>
-
-        <div style={{ textAlign: 'center' }}>
-          <motion.a href={APPLY_HREF} whileHover={{ y: -2, boxShadow: 'var(--l-sh-blue)' }} whileTap={{ scale: 0.98 }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--l-blue)', color: '#fff', padding: '15px 32px', borderRadius: 12, fontWeight: 700, fontSize: 15.5 }}>
-            Apply for free →
-          </motion.a>
+        <div className="lp-req-list">
+          <div className="lp-req">
+            <span className="check">
+              <Check />
+            </span>
+            <div className="rtext">
+              <h4>Reliable internet</h4>
+              <p>A stable connection — 10 Mbps+ recommended.</p>
+            </div>
+          </div>
+          <div className="lp-req">
+            <span className="check">
+              <Check />
+            </span>
+            <div className="rtext">
+              <h4>A quiet workspace</h4>
+              <p>Somewhere you can take calls without background noise.</p>
+            </div>
+          </div>
+          <div className="lp-req">
+            <span className="check">
+              <Check />
+            </span>
+            <div className="rtext">
+              <h4>A laptop or desktop</h4>
+              <p>Windows or Mac, with a working headset and webcam.</p>
+            </div>
+          </div>
+          <div className="lp-req">
+            <span className="check">
+              <Check />
+            </span>
+            <div className="rtext">
+              <h4>Conversational English</h4>
+              <p>Comfortable speaking and writing — we test and coach this.</p>
+            </div>
+          </div>
+          <div className="lp-req">
+            <span className="check">
+              <Check />
+            </span>
+            <div className="rtext">
+              <h4>~40 hrs / week availability</h4>
+              <p>Most placements are full-time; some roles offer part-time.</p>
+            </div>
+            <span className="opt">Flexible</span>
+          </div>
+          <div className="lp-req">
+            <span className="check">
+              <Check />
+            </span>
+            <div className="rtext">
+              <h4>Valid government ID</h4>
+              <p>For verification and contracting once you&apos;re placed.</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

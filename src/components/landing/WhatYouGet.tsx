@@ -1,43 +1,109 @@
-'use client'
-import Image from 'next/image'
-import { motion } from 'motion/react'
-import { Icon } from '@/components/ui/Icon'
-import { BENEFITS } from '@/lib/landing-data'
-
-const EASE = [0.16, 1, 0.3, 1] as const
-
 export default function WhatYouGet() {
   return (
-    <section className="l-section-pad" style={{ background: 'var(--l-bg)', padding: '116px 48px' }}>
-      <div className="l-split-grid" style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: '0.82fr 1fr', gap: 72, alignItems: 'center' }}>
-        <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, ease: EASE }}>
-          <h2 style={{ fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: 'clamp(2.1rem, 3.6vw, 3.1rem)', color: 'var(--l-ink)', letterSpacing: '-0.03em', lineHeight: 1.04, margin: '0 0 18px' }}>
-            More than a job, <span style={{ color: 'var(--l-blue)' }}>a real foothold</span>
-          </h2>
-          <p style={{ fontSize: 15.5, lineHeight: 1.6, color: 'var(--l-body)', margin: '0 0 32px', maxWidth: 400 }}>
-            Placement is the start. Here is what comes with working through RemConnect.
-          </p>
-          <div style={{ position: 'relative', borderRadius: 22, overflow: 'hidden', aspectRatio: '4 / 3', boxShadow: 'var(--l-sh-lg)', border: '1px solid var(--l-line)' }}>
-            <Image src="/agents/nahom-dereje.jpg" alt="A RemConnect-placed professional working remotely" fill sizes="(max-width: 1024px) 100vw, 420px" style={{ objectFit: 'cover' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(11,18,32,0.55), transparent 55%)' }} />
-            <p style={{ position: 'absolute', bottom: 16, left: 18, margin: 0, fontSize: 12.5, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>Working remotely from Addis Ababa</p>
+    <section className="lp-section tight" id="why" data-screen-label="What you get">
+      <div className="lp-getgrid">
+        <div>
+          <div className="lp-index reveal">
+            <span>03</span>
+            <span className="ln" />
+            <b>What you get</b>
           </div>
-        </motion.div>
-
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={{ hidden: {}, show: { transition: { staggerChildren: 0.09 } } }}>
-          {BENEFITS.map((b, i) => (
-            <motion.div key={b.id} variants={{ hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } } }}
-              style={{ display: 'flex', gap: 22, padding: '24px 0', borderBottom: i < BENEFITS.length - 1 ? '1px solid var(--l-line)' : 'none' }}>
-              <div style={{ width: 46, height: 46, flexShrink: 0, borderRadius: 13, display: 'grid', placeItems: 'center', background: 'var(--l-tint)', color: 'var(--l-blue)' }}>
-                <Icon name={b.icon} size={21} color="var(--l-blue)" />
+          <h2 className="lp-h2 reveal d1" style={{ fontSize: 'clamp(36px,4.4vw,56px)' }}>
+            More than a job. A profile that <em>follows you.</em>
+          </h2>
+          <div className="lp-benefits">
+            <div className="lp-benefit reveal d1">
+              <div className="bic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                  <path d="m3 7 9-4 9 4-9 4-9-4Z" />
+                  <path d="M7 9v5c0 1.5 2.5 3 5 3s5-1.5 5-3V9" />
+                  <path d="M21 7v6" />
+                </svg>
               </div>
               <div>
-                <h3 style={{ fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: '1.15rem', color: 'var(--l-ink)', letterSpacing: '-0.015em', margin: '0 0 5px' }}>{b.title}</h3>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--l-body)', margin: 0 }}>{b.body}</p>
+                <h4>Free training &amp; certification</h4>
+                <p>The full curriculum at no cost. Certifications carry across every placement you take.</p>
               </div>
-            </motion.div>
-          ))}
-        </motion.div>
+            </div>
+            <div className="lp-benefit reveal d2">
+              <div className="bic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v5l3 2" />
+                </svg>
+              </div>
+              <div>
+                <h4>Real pay, your currency</h4>
+                <p>Competitive monthly pay in USD or ETB, on time, with no agency cut taken from your wage.</p>
+              </div>
+            </div>
+            <div className="lp-benefit reveal d3">
+              <div className="bic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                  <path d="M9 12l2 2 4-4" />
+                  <path d="M12 3 4 6v6c0 5 3.5 7.5 8 9 4.5-1.5 8-4 8-9V6Z" />
+                </svg>
+              </div>
+              <div>
+                <h4>Coaching &amp; a growing portfolio</h4>
+                <p>Monthly QA reviews, a coach in your corner, and a transparent profile that grows from client to client.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="lp-profile-stage reveal d2">
+          <div className="lp-profile-glow" />
+          <div className="lp-profile">
+            <div className="lp-profile-top">
+              <span className="lp-profile-chip">
+                <span className="d" />
+                Bench-ready · placeable
+              </span>
+              <div className="lp-profile-id">RC-AGENT · #2847 · Cohort 14</div>
+              <div className="lp-profile-av">L</div>
+            </div>
+            <div className="lp-profile-body">
+              <div className="lp-profile-name">Liya D.</div>
+              <div className="lp-profile-role">Voice &amp; Written Support · Addis Ababa</div>
+              <div className="lp-profile-meta">
+                <span className="rc-chip">Voice</span>
+                <span className="rc-chip">Written</span>
+                <span className="rc-chip rc-chip-good">De-escalation</span>
+              </div>
+              <div className="lp-profile-skills">
+                <div className="lp-cs">
+                  <span className="lp-cs-l">English</span>
+                  <span className="lp-cs-bar" data-skill="86">
+                    <span />
+                  </span>
+                  <span className="lp-cs-v tnum">86</span>
+                </div>
+                <div className="lp-cs">
+                  <span className="lp-cs-l">Empathy</span>
+                  <span className="lp-cs-bar" data-skill="92">
+                    <span />
+                  </span>
+                  <span className="lp-cs-v tnum">92</span>
+                </div>
+                <div className="lp-cs">
+                  <span className="lp-cs-l">Written QA</span>
+                  <span className="lp-cs-bar" data-skill="90">
+                    <span />
+                  </span>
+                  <span className="lp-cs-v tnum">90</span>
+                </div>
+                <div className="lp-cs">
+                  <span className="lp-cs-l">Systems</span>
+                  <span className="lp-cs-bar" data-skill="78">
+                    <span />
+                  </span>
+                  <span className="lp-cs-v tnum">78</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )

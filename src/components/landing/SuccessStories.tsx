@@ -1,69 +1,124 @@
-'use client'
-import { useState } from 'react'
-import Image from 'next/image'
-import { AnimatePresence, motion } from 'motion/react'
-import { SUCCESS_STORIES } from '@/lib/landing-data'
-
-const EASE = [0.16, 1, 0.3, 1] as const
-
 export default function SuccessStories() {
-  const [active, setActive] = useState(0)
-  const story = SUCCESS_STORIES[active]
-
   return (
-    <section id="stories" className="l-section-pad" style={{ background: 'var(--l-bg)', padding: '116px 48px', scrollMarginTop: 80 }}>
-      <div style={{ maxWidth: 1180, margin: '0 auto' }}>
-        <motion.div initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.65, ease: EASE }} style={{ marginBottom: 52, maxWidth: 560 }}>
-          <p style={{ fontFamily: 'var(--font-family-sans)', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', color: 'var(--l-blue)', textTransform: 'uppercase', margin: '0 0 16px' }}>
-            Success stories
-          </p>
-          <h2 style={{ fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: 'clamp(2.2rem, 4vw, 3.4rem)', color: 'var(--l-ink)', letterSpacing: '-0.03em', lineHeight: 1.02, margin: '0 0 16px' }}>
-            Real people, <span style={{ color: 'var(--l-blue)' }}>real placements</span>
+    <section className="lp-stories" id="stories" data-screen-label="Success stories">
+      <div className="lp-stories-head">
+        <div>
+          <div className="lp-index on-dark reveal">
+            <span>04</span>
+            <span className="ln" />
+            <b>Success stories</b>
+          </div>
+          <h2 className="lp-h2 reveal d1">
+            From application to <em>thriving.</em>
           </h2>
-          <p style={{ fontSize: 15.5, lineHeight: 1.6, color: 'var(--l-body)', margin: 0 }}>
-            Professionals from Addis Ababa now working with teams around the world.
-          </p>
-        </motion.div>
-
-        <div className="l-stories-grid" style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: 56, alignItems: 'center' }}>
-          <motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, ease: EASE }}
-            style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 24, overflow: 'hidden', boxShadow: 'var(--l-sh-lg)', border: '1px solid var(--l-line)', background: 'var(--l-ink)' }}>
-            <AnimatePresence mode="wait">
-              <motion.div key={story.id} initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.45, ease: EASE }} style={{ position: 'absolute', inset: 0 }}>
-                <Image src={story.img} alt={`${story.name}, ${story.role}`} fill sizes="400px" style={{ objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(11,18,32,0.9) 0%, transparent 45%)' }} />
-                <div style={{ position: 'absolute', bottom: 24, left: 24, right: 24 }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 11px', borderRadius: 999, background: 'rgba(255,255,255,0.92)', fontSize: 11, fontWeight: 700, color: '#1d5e3c', letterSpacing: '0.02em', marginBottom: 12 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--rc-good)' }} /> {story.outcome}
-                  </span>
-                  <p style={{ margin: 0, fontFamily: 'var(--font-family-display)', fontWeight: 600, fontSize: '1.4rem', color: '#fff', letterSpacing: '-0.01em' }}>{story.name}</p>
-                  <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>{story.role} · {story.placedAt}</p>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, ease: EASE }}>
-            <div style={{ fontFamily: 'var(--font-family-display)', fontSize: '4rem', lineHeight: 0.7, color: 'var(--l-line-2)', marginBottom: 16 }}>&ldquo;</div>
-            <AnimatePresence mode="wait">
-              <motion.blockquote key={story.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease: EASE }}
-                style={{ margin: '0 0 36px', fontFamily: 'var(--font-family-display)', fontWeight: 500, fontSize: 'clamp(1.3rem, 2vw, 1.85rem)', lineHeight: 1.4, color: 'var(--l-ink)', letterSpacing: '-0.02em', maxWidth: 600 }}>
-                {story.quote}
-              </motion.blockquote>
-            </AnimatePresence>
-
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              {SUCCESS_STORIES.map((s, i) => (
-                <button key={s.id} onClick={() => setActive(i)} aria-label={`Show ${s.name}'s story`}
-                  style={{ position: 'relative', width: 54, height: 54, borderRadius: '50%', overflow: 'hidden', border: `2px solid ${i === active ? 'var(--l-blue)' : 'transparent'}`, padding: 0, cursor: 'pointer', background: 'none', opacity: i === active ? 1 : 0.55, transition: 'opacity 0.2s, border-color 0.2s', flexShrink: 0, boxShadow: i === active ? 'var(--l-sh-md)' : 'none' }}
-                  onMouseEnter={e => { if (i !== active) e.currentTarget.style.opacity = '0.85' }}
-                  onMouseLeave={e => { if (i !== active) e.currentTarget.style.opacity = '0.55' }}>
-                  <Image src={s.img} alt={s.name} fill sizes="54px" style={{ objectFit: 'cover' }} />
-                </button>
-              ))}
-            </div>
-          </motion.div>
         </div>
+        <p className="lp-lede reveal d2">
+          Real agents, real placements — four of the people who started exactly where you are now.
+        </p>
+      </div>
+
+      <div className="lp-stories-scroll" id="lpStoriesScroll">
+        <article className="lp-story reveal" style={{ background: 'linear-gradient(160deg,#1d6fd6,#0c3a7a)' }}>
+          <div className="num">01</div>
+          <div className="face">L</div>
+          <div className="body">
+            <p className="q">
+              &quot;Zero BPO experience to a full-time US voice role in six weeks. My coach ran me through every tough
+              call before I went live.&quot;
+            </p>
+            <div className="nm">Liya D.</div>
+            <div className="rl">Voice Support · Northwind Retail</div>
+            <div className="stat">
+              <div>
+                <div className="v tnum">6 wks</div>
+                <div className="sl">To first shift</div>
+              </div>
+              <div>
+                <div className="v tnum">14 mo</div>
+                <div className="sl">With RemConnect</div>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article className="lp-story reveal d1" style={{ background: 'linear-gradient(160deg,#3a4a66,#1a2338)' }}>
+          <div className="num">02</div>
+          <div className="face">D</div>
+          <div className="body">
+            <p className="q">
+              &quot;English was my strength, but I&apos;d never worked a ticket queue. Weekly QA reviews put me at the
+              top of my team in two months.&quot;
+            </p>
+            <div className="nm">Dagim K.</div>
+            <div className="rl">Written Support · Apex Insurance</div>
+            <div className="stat">
+              <div>
+                <div className="v">Top 5%</div>
+                <div className="sl">Written QA</div>
+              </div>
+              <div>
+                <div className="v">USD</div>
+                <div className="sl">Paid monthly</div>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article className="lp-story reveal d2" style={{ background: 'linear-gradient(160deg,#0b4fa8,#0c3a7a)' }}>
+          <div className="num">03</div>
+          <div className="face">H</div>
+          <div className="body">
+            <p className="q">
+              &quot;The de-escalation training is the real deal. Angry callers used to rattle me; now they&apos;re the
+              calls I&apos;m best at.&quot;
+            </p>
+            <div className="nm">Hanna T.</div>
+            <div className="rl">Hybrid Support · Lumen Telecom</div>
+            <div className="stat">
+              <div>
+                <div className="v tnum">91</div>
+                <div className="sl">Voice QA</div>
+              </div>
+              <div>
+                <div className="v tnum">2</div>
+                <div className="sl">Promotions</div>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article className="lp-story reveal d3" style={{ background: 'linear-gradient(160deg,#24507e,#0d1f3c)' }}>
+          <div className="num">04</div>
+          <div className="face">M</div>
+          <div className="body">
+            <p className="q">
+              &quot;I started as an agent and now I coach a cohort of twelve. RemConnect gave me a path I couldn&apos;t
+              find anywhere else in Addis.&quot;
+            </p>
+            <div className="nm">Mekdes A.</div>
+            <div className="rl">Team Coach · mentors 12 agents</div>
+            <div className="stat">
+              <div>
+                <div className="v tnum">12</div>
+                <div className="sl">Agents mentored</div>
+              </div>
+              <div>
+                <div className="v tnum">94</div>
+                <div className="sl">Coaching score</div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div className="lp-stories-nav">
+        <button className="lp-snav" id="lpStoriesPrev" aria-label="Previous">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button className="lp-snav primary" id="lpStoriesNext" aria-label="Next">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
     </section>
   )
