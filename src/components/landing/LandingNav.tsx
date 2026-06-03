@@ -62,11 +62,7 @@ export default function LandingNav() {
                     </div>
                   </a>
                   <a className="lp-mega-card group" data-scroll="why">
-                    <img
-                      className="lp-img"
-                      src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=600"
-                      alt="Support agents at work"
-                    />
+                    <img className="lp-img" src="/agents/maereg-hailu.jpg" alt="RemConnect agent Maereg Hailu" />
                     <div className="ov" />
                     <div className="lb">
                       <div className="k">Your profile</div>

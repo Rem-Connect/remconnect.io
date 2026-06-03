@@ -77,7 +77,6 @@ export function AgentDetail({ agentId }: { agentId: string }) {
           <>
             <button className="btn btn-secondary btn-sm"><NetIcons.Refresh width={13} height={13}/> Refresh</button>
             <button className="btn btn-secondary btn-sm"><NetIcons.Download width={13} height={13}/> Export</button>
-            <button className="btn btn-primary btn-sm"><NetIcons.Zap width={13} height={13}/> Run test now</button>
           </>
         }
       />

@@ -7,6 +7,7 @@ import { Icon } from '@/components/ui/Icon'
 import { ScoreRing } from '@/components/ui/ScoreRing'
 import { SAMPLE_AGENTS } from '@/lib/admin-data'
 import { getAgentPhoto, isExternalPhoto } from '@/lib/agent-photo'
+import { useAdmin } from '@/context/AdminContext'
 import type { SampleAgent } from '@/types/admin'
 
 function AgentAvatar({ agent, size }: { agent: SampleAgent; size: number }) {
@@ -53,7 +54,7 @@ function StatusBadge({ status }: { status: SampleAgent['status'] }) {
 export function AgentDirectory() {
   const router = useRouter()
   const [view, setView] = useState<View>('table')
-  const [stealth, setStealth] = useState(false)
+  const { stealth, toggleStealth } = useAdmin()
   const [statusFilter, setStatusFilter] = useState<Status>('all')
   const [search, setSearch] = useState('')
 
@@ -111,7 +112,7 @@ export function AgentDirectory() {
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
           {/* Stealth toggle */}
           <button
-            onClick={() => setStealth(s => !s)}
+            onClick={toggleStealth}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 12px',
               borderRadius: 6, border: `1px solid ${stealth ? '#c08a2a66' : '#e3e0d2'}`,

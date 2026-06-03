@@ -7,7 +7,9 @@ import { Icon } from '@/components/ui/Icon'
 import { ScoreRing } from '@/components/ui/ScoreRing'
 import { Chip } from '@/components/ui/Chip'
 import { SAMPLE_AGENTS, AGENT_EXTRAS } from '@/lib/admin-data'
+import { NET_AGENTS } from '@/lib/network-data'
 import { getAgentPhoto, isExternalPhoto } from '@/lib/agent-photo'
+import { useAdmin } from '@/context/AdminContext'
 import '@/app/network.css'
 
 interface Props { agentId: string }
@@ -58,7 +60,7 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 
 export function AgentAdminProfile({ agentId }: Props) {
   const router = useRouter()
-  const [profileView, setProfileView] = useState<ProfileView>('internal')
+  const { stealth, setStealth } = useAdmin()
   const [tab, setTab] = useState('overview')
 
   const agent = SAMPLE_AGENTS.find(a => a.id === agentId)
@@ -67,19 +69,31 @@ export function AgentAdminProfile({ agentId }: Props) {
   )
 
   const extras = AGENT_EXTRAS[agentId] || (AGENT_EXTRAS as Record<string, typeof AGENT_EXTRAS[string]>)['__default']
-  const stealth = profileView === 'stealth'
   const sc = STATUS_COLORS[agent.status]
   const photo = extras.photo || agent.photo || getAgentPhoto(agent.id, 200)
 
   const visibleTabs = TABS.filter(t => !(stealth && t.id === 'contract'))
 
   const handleStealthToggle = (v: ProfileView) => {
-    setProfileView(v)
+    setStealth(v === 'stealth')
     if (v === 'stealth' && tab === 'contract') setTab('overview')
   }
 
   const scoreColor = agent.score >= 90 ? '#2f8d5c' : agent.score >= 75 ? '#c08a2a' : '#b54838'
   const hasPerf = extras.qa > 0 || extras.csat !== null || extras.aht !== null
+  const netAgent = NET_AGENTS.find(n => n.id === agent.id)
+  const isMonitored = !!netAgent
+
+  // Shared coloring so the profile's Network tab matches /network/agents thresholds.
+  const NET_STATUS_UI = {
+    healthy:  { label: 'Connection healthy',  color: '#2f8d5c', chip: 'good' as const, chipLabel: 'Online' },
+    warning:  { label: 'Connection degraded', color: '#c08a2a', chip: 'warn' as const, chipLabel: 'Degraded' },
+    critical: { label: 'Connection unstable', color: '#b54838', chip: 'bad' as const,  chipLabel: 'At risk' },
+  }
+  const metricColor = (v: number, good: number, warn: number, higherIsBetter = true) =>
+    higherIsBetter
+      ? (v >= good ? '#2f8d5c' : v >= warn ? '#c08a2a' : '#b54838')
+      : (v <= good ? '#2f8d5c' : v <= warn ? '#c08a2a' : '#b54838')
 
   return (
     <div className="net-scope" style={{ padding: '24px 32px 56px', maxWidth: 1180, margin: '0 auto' }}>
@@ -91,17 +105,20 @@ export function AgentAdminProfile({ agentId }: Props) {
           Back to directory
         </button>
         <div style={{ display: 'flex', background: '#f3f1ea', borderRadius: 7, padding: 3, gap: 2 }}>
-          {(['internal', 'stealth'] as ProfileView[]).map(v => (
+          {(['internal', 'stealth'] as ProfileView[]).map(v => {
+            const active = v === (stealth ? 'stealth' : 'internal')
+            return (
             <button key={v} onClick={() => handleStealthToggle(v)} style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
               padding: '5px 12px', borderRadius: 5, border: 'none', fontSize: 12, cursor: 'pointer',
-              background: profileView === v ? (v === 'stealth' ? '#c08a2a' : '#0b1220') : 'transparent',
-              color: profileView === v ? '#fff' : '#5a6072', fontWeight: 500,
+              background: active ? (v === 'stealth' ? '#c08a2a' : '#0b1220') : 'transparent',
+              color: active ? '#fff' : '#5a6072', fontWeight: 500,
             }}>
-              <Icon name={v === 'stealth' ? 'eye-off' : 'eye'} size={11} color={profileView === v ? '#fff' : '#5a6072'} />
+              <Icon name={v === 'stealth' ? 'eye-off' : 'eye'} size={11} color={active ? '#fff' : '#5a6072'} />
               {v === 'internal' ? 'Internal' : 'Stealth'}
             </button>
-          ))}
+            )
+          })}
         </div>
       </div>
 
@@ -445,19 +462,56 @@ export function AgentAdminProfile({ agentId }: Props) {
         {/* ─── NETWORK ─── */}
         {tab === 'network' && (
           <div style={{ display: 'grid', gap: 20 }}>
-            <SectionTitle>Network & remote setup</SectionTitle>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <div style={{ marginBottom: -14 }}><SectionTitle>Network &amp; remote setup</SectionTitle></div>
+              {isMonitored ? (
+                <button
+                  onClick={() => router.push(`/admin/network/agents/${agent.id}`)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 7,
+                    padding: '7px 12px', borderRadius: 7, cursor: 'pointer',
+                    border: '1px solid rgba(29,111,214,0.3)', background: 'rgba(29,111,214,0.06)',
+                    color: '#1d6fd6', fontSize: 12, fontWeight: 600,
+                  }}
+                >
+                  <Icon name="activity" size={13} color="#1d6fd6" />
+                  View full network history
+                  <Icon name="arrow-right" size={13} color="#1d6fd6" />
+                </button>
+              ) : (
+                <span style={{ fontSize: 11.5, color: '#8b93a7', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <Icon name="info" size={12} color="#8b93a7" />
+                  Network monitoring begins after onboarding
+                </span>
+              )}
+            </div>
 
-            {/* Connection status banner */}
-            <Card style={{ background: 'linear-gradient(135deg, rgba(47,141,92,0.06), #fff)', borderColor: 'rgba(47,141,92,0.3)', display: 'flex', gap: 16, alignItems: 'center' }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(47,141,92,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Icon name="globe" size={22} color="#2f8d5c" />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#2f8d5c', marginBottom: 2 }}>Connection healthy</div>
-                <div style={{ fontSize: 12, color: '#5a6072' }}>{extras.location} · {extras.timezone} · Last verified recently</div>
-              </div>
-              <Chip variant="good"><Icon name="check" size={11} /> Online</Chip>
-            </Card>
+            {/* Connection status banner — driven by the same NET_AGENTS record as /network/agents */}
+            {(() => {
+              const ui = netAgent ? NET_STATUS_UI[netAgent.status] : null
+              const color = ui?.color ?? '#5a6072'
+              const lastSeen = netAgent ? (netAgent.lastSeen === 0 ? 'just now' : `${netAgent.lastSeen} min ago`) : '—'
+              return (
+                <Card style={{ background: `linear-gradient(135deg, ${color}14, #fff)`, borderColor: `${color}4d`, display: 'flex', gap: 16, alignItems: 'center' }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 12, background: `${color}1f`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Icon name="globe" size={22} color={color} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color, marginBottom: 2 }}>
+                      {ui ? ui.label : 'Not monitored yet'}
+                    </div>
+                    <div style={{ fontSize: 12, color: '#5a6072' }}>
+                      {netAgent
+                        ? `${extras.location} · ${netAgent.isp} · Last test ${lastSeen}`
+                        : `${extras.location} · ${extras.timezone} · Monitoring begins after onboarding`}
+                    </div>
+                  </div>
+                  {netAgent
+                    ? <Chip variant={ui!.chip}><Icon name={netAgent.online ? 'check' : 'info'} size={11} /> {netAgent.online ? ui!.chipLabel : 'Offline'}</Chip>
+                    : <Chip variant="neutral">Not set up</Chip>}
+                </Card>
+              )
+            })()}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               {/* Connection details */}
@@ -468,8 +522,8 @@ export function AgentAdminProfile({ agentId }: Props) {
                     { icon: 'globe', label: 'Location', value: extras.location },
                     { icon: 'clock', label: 'Timezone', value: extras.timezone },
                     { icon: 'activity', label: 'Working hours', value: extras.hours },
-                    { icon: 'globe', label: 'ISP', value: 'Ethio Telecom' },
-                    { icon: 'shield', label: 'VPN', value: 'Not active' },
+                    { icon: 'globe', label: 'ISP', value: netAgent?.isp ?? '—' },
+                    { icon: 'shield', label: 'VPN', value: netAgent ? (netAgent.vpn ? 'Detected' : 'Not active') : '—' },
                   ].map(({ icon, label, value }) => (
                     <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{ width: 28, height: 28, borderRadius: 6, background: '#f3f1ea', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -488,16 +542,24 @@ export function AgentAdminProfile({ agentId }: Props) {
               <Card>
                 <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#8b93a7', marginBottom: 14 }}>Last speed test</div>
                 <div style={{ display: 'grid', gap: 12 }}>
-                  {[
-                    { label: 'Download', value: '24.6', unit: 'Mbps', good: true },
-                    { label: 'Upload',   value: '8.2',  unit: 'Mbps', good: true },
-                    { label: 'Latency',  value: '88',   unit: 'ms',   good: true },
-                    { label: 'Packet loss', value: '0.0', unit: '%',  good: true },
-                  ].map(({ label, value, unit, good }) => (
+                  {(netAgent
+                    ? [
+                        { label: 'Download',    value: netAgent.download.toFixed(1), unit: 'Mbps', color: metricColor(netAgent.download, 25, 15, true) },
+                        { label: 'Upload',      value: netAgent.upload.toFixed(1),   unit: 'Mbps', color: metricColor(netAgent.upload, 15, 10, true) },
+                        { label: 'Latency',     value: String(netAgent.latency),     unit: 'ms',   color: metricColor(netAgent.latency, 100, 200, false) },
+                        { label: 'Packet loss', value: netAgent.loss.toFixed(1),     unit: '%',    color: metricColor(netAgent.loss, 0.5, 2, false) },
+                      ]
+                    : [
+                        { label: 'Download',    value: '—', unit: 'Mbps', color: '#8b93a7' },
+                        { label: 'Upload',      value: '—', unit: 'Mbps', color: '#8b93a7' },
+                        { label: 'Latency',     value: '—', unit: 'ms',   color: '#8b93a7' },
+                        { label: 'Packet loss', value: '—', unit: '%',    color: '#8b93a7' },
+                      ]
+                  ).map(({ label, value, unit, color }) => (
                     <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: 12.5, color: '#5a6072' }}>{label}</span>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                        <span style={{ fontFamily: 'monospace', fontSize: 18, fontWeight: 700, color: good ? '#2f8d5c' : '#b54838' }}>{value}</span>
+                        <span style={{ fontFamily: 'monospace', fontSize: 18, fontWeight: 700, color }}>{value}</span>
                         <span style={{ fontSize: 10, color: '#8b93a7' }}>{unit}</span>
                       </div>
                     </div>
@@ -517,10 +579,10 @@ export function AgentAdminProfile({ agentId }: Props) {
                   { label: '2nd monitor',  ok: true  },
                   { label: 'PC / Laptop',  ok: true  },
                   { label: 'Router',       ok: true  },
-                  { label: 'Power bank',   ok: false },
+                  { label: 'Power bank',   ok: true  },
                   { label: 'Proper desk',  ok: true  },
                   { label: 'Headset',      ok: true  },
-                  { label: 'Charger',      ok: false },
+                  { label: 'Charger',      ok: true  },
                   { label: 'Extinguisher', ok: false },
                 ].map(({ label, ok }) => (
                   <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', background: ok ? 'rgba(47,141,92,0.06)' : 'rgba(181,72,56,0.05)', borderRadius: 7, border: `1px solid ${ok ? 'rgba(47,141,92,0.2)' : 'rgba(181,72,56,0.15)'}` }}>

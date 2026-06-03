@@ -1,4 +1,9 @@
+import { LANDING_FEATURE_AGENT, LANDING_TRUST_AVATARS } from '@/lib/landing-data'
+
+const AVATAR_IMG: React.CSSProperties = { width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit', display: 'block' }
+
 export default function Hero() {
+  const f = LANDING_FEATURE_AGENT
   return (
     <header className="lp-hero">
       <div className="lp-hero-bg">
@@ -11,15 +16,15 @@ export default function Hero() {
       </div>
 
       <div className="lp-hero-chip">
-        <span className="av">L</span>
+        <span className="av"><img src={f.photo} alt={f.name} style={AVATAR_IMG} /></span>
         <span>
-          <span className="nm">Liya D.</span>
+          <span className="nm">{f.short}</span>
           <span className="rl" style={{ display: 'block' }}>
-            Voice &amp; Written · placed
+            Sales Development · placed
           </span>
         </span>
         <span className="qa">
-          <b className="tnum">94</b>
+          <b className="tnum">{f.qa}</b>
           <small>QA score</small>
         </span>
       </div>
@@ -55,9 +60,11 @@ export default function Hero() {
           </div>
           <div className="lp-hero-trust">
             <div className="lp-hero-avs">
-              <span className="a" style={{ background: 'linear-gradient(135deg,#1d6fd6,#0c3a7a)' }}>L</span>
-              <span className="a" style={{ background: 'linear-gradient(135deg,#3a4a66,#1a2338)' }}>D</span>
-              <span className="a" style={{ background: 'linear-gradient(135deg,#0b4fa8,#0c3a7a)' }}>H</span>
+              {LANDING_TRUST_AVATARS.map((a) => (
+                <span className="a" key={a.name} style={{ overflow: 'hidden' }}>
+                  <img src={a.photo} alt={a.name} style={AVATAR_IMG} />
+                </span>
+              ))}
               <span className="a" style={{ background: 'var(--rc-amber)' }}>+</span>
             </div>
             <div>

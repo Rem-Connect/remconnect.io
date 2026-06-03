@@ -45,8 +45,9 @@ export default function FinalCTA() {
             <div className="lp-stack-media group">
               <img
                 className="lp-img"
-                src="https://images.pexels.com/photos/3182811/pexels-photo-3182811.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="A RemConnect team collaborating"
+                src="/agents/noud-zewgemichael.jpg"
+                alt="RemConnect agent Noud Zewgemichael"
+                style={{ objectPosition: 'center 20%' }}
               />
             </div>
           </div>

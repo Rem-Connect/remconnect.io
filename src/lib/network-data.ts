@@ -1,6 +1,8 @@
 import type { NetworkAgent, HistoryRow, NetworkIncident, IspStats, ShiftSession, TestLogRow } from '@/types/network';
+import type { SampleAgent } from '@/types/admin';
 import { mulberry32 } from './network-utils';
 import { getAgentPhoto } from './agent-photo';
+import { SAMPLE_AGENTS } from './admin-data';
 
 export const TEAMS     = ['Customer Support', 'Technical Support', 'Sales', 'Back Office', 'QA'];
 export const LOCATIONS = ['Addis Ababa', 'Nairobi', 'Lagos', 'Accra', 'Kampala', 'Dar es Salaam'];
@@ -14,21 +16,50 @@ const NAMES = [
   'Kiros Tesfai','Amanuel Hailu','Mimi Gebru','Tekeste Araya','Elsa Rezene',
 ];
 
-function makeAgent(i: number): NetworkAgent {
-  const rand    = mulberry32(i * 7 + 13);
-  const ispIdx  = Math.floor(rand() * ISPS.length);
-  const planDown = [10, 20, 50, 100][Math.floor(rand() * 4)];
-  const planUp   = Math.floor(planDown * (0.3 + rand() * 0.4));
-  const utilPct  = 30 + rand() * 65;
-  const download = Math.max(2, (planDown * utilPct / 100) * (0.7 + rand() * 0.6));
-  const upload   = Math.max(1, planUp * (0.4 + rand() * 0.5));
-  const latency  = Math.floor(30 + rand() * 300);
-  const loss     = Math.round((rand() * 3) * 100) / 100;
-  const jitter   = Math.floor(rand() * 40);
-
+// Healthy-skewed connection metrics. critP / warnP gate how often an agent degrades —
+// defaults keep ~84% of agents healthy; pass lower values for an even cleaner population.
+function genConnMetrics(rand: () => number, critP = 0.05, warnP = 0.16) {
+  const roll = rand();
+  let download: number, upload: number, latency: number, loss: number;
+  if (roll < critP) {                 // rare critical
+    download = 8 + rand() * 6;
+    upload   = 3 + rand() * 5;
+    latency  = 360 + Math.floor(rand() * 180);
+    loss     = 2.1 + rand() * 1.4;
+  } else if (roll < warnP) {          // occasional warning
+    download = 16 + rand() * 8;
+    upload   = 10 + rand() * 4;
+    latency  = 150 + Math.floor(rand() * 120);
+    loss     = 0.6 + rand() * 0.9;
+  } else {                            // healthy — the common case
+    download = 32 + rand() * 68;
+    upload   = 16 + rand() * 28;
+    latency  = 40 + Math.floor(rand() * 55);
+    loss     = rand() < 0.7 ? 0 : Math.round(rand() * 0.3 * 100) / 100;
+  }
+  // Size the plan comfortably above usage so capacity bars read ~30–55% (healthy), not saturated.
+  const planDown = [50, 100, 200].find(p => p >= download * 1.6) ?? 200;
+  const planUp   = [25, 50, 100].find(p => p >= upload * 1.6)   ?? 100;
   let status: NetworkAgent['status'] = 'healthy';
   if (download < 15 || latency > 400 || loss > 2) status = 'critical';
   else if (download < 25 || latency > 150 || loss > 0.5) status = 'warning';
+  return {
+    download:    Math.round(download * 10) / 10,
+    upload:      Math.round(upload * 10) / 10,
+    latency,
+    loss:        Math.round(loss * 100) / 100,
+    jitter:      Math.floor(rand() * 18),
+    planDown,
+    planUp,
+    ispCapacity: Math.round((download / planDown) * 100),
+    status,
+  };
+}
+
+function makeAgent(i: number): NetworkAgent {
+  const rand   = mulberry32(i * 7 + 13);
+  const ispIdx = Math.floor(rand() * ISPS.length);
+  const m      = genConnMetrics(rand);
 
   const spark = (base: number, amp: number, n = 24) =>
     Array.from({ length: n }, (_, k) => Math.max(0, base + Math.sin(k / 3) * amp + (mulberry32(i * k + 99)() - 0.5) * amp));
@@ -41,24 +72,24 @@ function makeAgent(i: number): NetworkAgent {
     location:    LOCATIONS[ispIdx % LOCATIONS.length],
     isp:         ISPS[ispIdx],
     ip:          `196.${Math.floor(rand() * 255)}.${Math.floor(rand() * 255)}.${Math.floor(rand() * 255)}`,
-    vpn:         rand() > 0.75,
-    areaMaxDown: planDown,
-    areaMaxUp:   planUp,
-    ispCapacity: Math.round(utilPct),
-    planDown,
-    planUp,
-    download:    Math.round(download * 10) / 10,
-    upload:      Math.round(upload   * 10) / 10,
-    latency,
-    loss,
-    jitter,
-    status,
+    vpn:         rand() > 0.85,
+    areaMaxDown: m.planDown,
+    areaMaxUp:   m.planUp,
+    ispCapacity: m.ispCapacity,
+    planDown:    m.planDown,
+    planUp:      m.planUp,
+    download:    m.download,
+    upload:      m.upload,
+    latency:     m.latency,
+    loss:        m.loss,
+    jitter:      m.jitter,
+    status:      m.status,
     lastSeen:    Math.floor(rand() * 15),
-    sparkDown:   spark(download, 8),
-    sparkUp:     spark(upload, 3),
-    sparkLatency:spark(latency, 50),
+    sparkDown:   spark(m.download, 8),
+    sparkUp:     spark(m.upload, 3),
+    sparkLatency:spark(m.latency, 40),
     shift:       SHIFTS[Math.floor(rand() * SHIFTS.length)],
-    online:      rand() > 0.15,
+    online:      rand() > 0.1,
     avatar:      getAgentPhoto(id, 96),
   };
 }
@@ -67,50 +98,109 @@ const REAL_AGENTS: NetworkAgent[] = [
   {
     id: 'AD-3001', name: 'Bezawit Berhanu', team: 'Sales', location: 'Addis Ababa',
     isp: 'Ethio Telecom', ip: '196.188.120.44', vpn: false,
-    areaMaxDown: 50, areaMaxUp: 15, ispCapacity: 52, planDown: 50, planUp: 15,
-    download: 24.6, upload: 8.2, latency: 72, loss: 0.0, jitter: 8,
+    areaMaxDown: 100, areaMaxUp: 50, ispCapacity: 49, planDown: 100, planUp: 50,
+    download: 48.6, upload: 22.4, latency: 44, loss: 0.0, jitter: 5,
     status: 'healthy', lastSeen: 2, online: true,
-    sparkDown: Array.from({ length: 24 }, (_, i) => 22 + Math.sin(i / 3) * 3),
-    sparkUp: Array.from({ length: 24 }, (_, i) => 7.8 + Math.sin(i / 4) * 1),
-    sparkLatency: Array.from({ length: 24 }, (_, i) => 70 + Math.sin(i / 2) * 10),
+    sparkDown: Array.from({ length: 24 }, (_, i) => 48.6 + Math.sin(i / 3) * 3),
+    sparkUp: Array.from({ length: 24 }, (_, i) => 22.4 + Math.sin(i / 4) * 1.5),
+    sparkLatency: Array.from({ length: 24 }, (_, i) => 44 + Math.sin(i / 2) * 6),
     shift: '14:00–22:00', avatar: '/agents/bezawit-berhanu.png',
   },
   {
     id: 'AD-3002', name: 'Nahom Dereje', team: 'Sales', location: 'Addis Ababa',
     isp: 'Ethio Telecom', ip: '196.188.100.21', vpn: false,
-    areaMaxDown: 50, areaMaxUp: 15, ispCapacity: 58, planDown: 50, planUp: 15,
-    download: 28.4, upload: 9.6, latency: 88, loss: 0.0, jitter: 12,
+    areaMaxDown: 100, areaMaxUp: 50, ispCapacity: 55, planDown: 100, planUp: 50,
+    download: 55.2, upload: 27.0, latency: 52, loss: 0.0, jitter: 7,
     status: 'healthy', lastSeen: 1, online: true,
-    sparkDown: Array.from({ length: 24 }, (_, i) => 26 + Math.sin(i / 3.5) * 4),
-    sparkUp: Array.from({ length: 24 }, (_, i) => 9.2 + Math.sin(i / 4) * 1.2),
-    sparkLatency: Array.from({ length: 24 }, (_, i) => 85 + Math.sin(i / 2.5) * 14),
+    sparkDown: Array.from({ length: 24 }, (_, i) => 55.2 + Math.sin(i / 3.5) * 4),
+    sparkUp: Array.from({ length: 24 }, (_, i) => 27 + Math.sin(i / 4) * 1.8),
+    sparkLatency: Array.from({ length: 24 }, (_, i) => 52 + Math.sin(i / 2.5) * 8),
     shift: '22:00–06:00', avatar: '/agents/nahom-dereje.jpg',
   },
   {
     id: 'AD-3003', name: 'Ermias Lemma', team: 'Sales', location: 'Addis Ababa',
-    isp: 'Ethio Telecom', ip: '196.188.77.110', vpn: true,
-    areaMaxDown: 100, areaMaxUp: 20, ispCapacity: 44, planDown: 100, planUp: 20,
-    download: 41.2, upload: 14.8, latency: 56, loss: 0.0, jitter: 6,
+    isp: 'Ethio Telecom', ip: '196.188.77.110', vpn: false,
+    areaMaxDown: 200, areaMaxUp: 100, ispCapacity: 46, planDown: 200, planUp: 100,
+    download: 92.4, upload: 41.0, latency: 38, loss: 0.0, jitter: 6,
     status: 'healthy', lastSeen: 0, online: true,
-    sparkDown: Array.from({ length: 24 }, (_, i) => 39 + Math.sin(i / 3) * 5),
-    sparkUp: Array.from({ length: 24 }, (_, i) => 14 + Math.sin(i / 3) * 1.5),
-    sparkLatency: Array.from({ length: 24 }, (_, i) => 54 + Math.sin(i / 2) * 8),
+    sparkDown: Array.from({ length: 24 }, (_, i) => 92.4 + Math.sin(i / 3) * 6),
+    sparkUp: Array.from({ length: 24 }, (_, i) => 41 + Math.sin(i / 3) * 2.5),
+    sparkLatency: Array.from({ length: 24 }, (_, i) => 38 + Math.sin(i / 2) * 5),
     shift: '22:00–06:00', avatar: '/agents/ermias-lemma.png',
   },
   {
     id: 'AD-3004', name: 'Tensae Wubeshet', team: 'Sales', location: 'Addis Ababa',
     isp: 'Ethio Telecom', ip: '196.188.93.55', vpn: false,
-    areaMaxDown: 20, areaMaxUp: 10, ispCapacity: 61, planDown: 20, planUp: 10,
-    download: 18.8, upload: 6.4, latency: 104, loss: 0.1, jitter: 15,
+    areaMaxDown: 100, areaMaxUp: 50, ispCapacity: 45, planDown: 100, planUp: 50,
+    download: 44.8, upload: 19.6, latency: 64, loss: 0.0, jitter: 9,
     status: 'healthy', lastSeen: 3, online: true,
-    sparkDown: Array.from({ length: 24 }, (_, i) => 17 + Math.sin(i / 4) * 3),
-    sparkUp: Array.from({ length: 24 }, (_, i) => 6 + Math.sin(i / 3) * 1),
-    sparkLatency: Array.from({ length: 24 }, (_, i) => 100 + Math.sin(i / 2) * 18),
+    sparkDown: Array.from({ length: 24 }, (_, i) => 44.8 + Math.sin(i / 4) * 3),
+    sparkUp: Array.from({ length: 24 }, (_, i) => 19.6 + Math.sin(i / 3) * 1.4),
+    sparkLatency: Array.from({ length: 24 }, (_, i) => 64 + Math.sin(i / 2) * 9),
     shift: '14:00–22:00', avatar: '/agents/tensae-wubeshet.jpg',
   },
 ];
 
-export const NET_AGENTS: NetworkAgent[] = [...REAL_AGENTS, ...Array.from({ length: 20 }, (_, i) => makeAgent(i))];
+// Stable numeric seed from an agent id (e.g. "AD-3005") so generated metrics are deterministic.
+function seedFromId(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+// Derive a network-monitor record from a directory agent so /network/agents stays in
+// sync with the agents directory. Connection metrics are deterministic per id; identity
+// (id, name, photo) comes straight from the directory.
+function makeRealAgentNet(src: SampleAgent): NetworkAgent {
+  const seed = seedFromId(src.id);
+  const rand = mulberry32(seed + 5);
+  // Featured directory agents: no criticals, only the occasional warning.
+  const m = genConnMetrics(rand, 0, 0.12);
+
+  const spark = (base: number, amp: number, n = 24) =>
+    Array.from({ length: n }, (_, k) => Math.max(0, base + Math.sin(k / 3) * amp + (mulberry32(seed * (k + 1) + 99)() - 0.5) * amp));
+
+  return {
+    id:          src.id,
+    name:        src.name,
+    team:        'Sales',
+    location:    'Addis Ababa',
+    isp:         'Ethio Telecom',
+    ip:          `196.188.${Math.floor(rand() * 255)}.${Math.floor(rand() * 255)}`,
+    vpn:         rand() > 0.85,
+    areaMaxDown: m.planDown,
+    areaMaxUp:   m.planUp,
+    ispCapacity: m.ispCapacity,
+    planDown:    m.planDown,
+    planUp:      m.planUp,
+    download:    m.download,
+    upload:      m.upload,
+    latency:     m.latency,
+    loss:        m.loss,
+    jitter:      m.jitter,
+    status:      m.status,
+    lastSeen:    Math.floor(rand() * 12),
+    sparkDown:   spark(m.download, 8),
+    sparkUp:     spark(m.upload, 3),
+    sparkLatency:spark(m.latency, 40),
+    shift:       SHIFTS[Math.floor(rand() * SHIFTS.length)],
+    online:      rand() > 0.12,
+    avatar:      src.photo!,
+  };
+}
+
+// Onboarded directory agents (deployed / bench / assessment — i.e. those with a real
+// photo on file), excluding the four already hand-authored above.
+const HARDCODED_IDS = new Set(REAL_AGENTS.map(a => a.id));
+const DIRECTORY_NET_AGENTS: NetworkAgent[] = SAMPLE_AGENTS
+  .filter(a => a.status !== 'recruit' && !HARDCODED_IDS.has(a.id) && (a.photo?.startsWith('/agents/') ?? false))
+  .map(makeRealAgentNet);
+
+export const NET_AGENTS: NetworkAgent[] = [
+  ...REAL_AGENTS,
+  ...DIRECTORY_NET_AGENTS,
+  ...Array.from({ length: 20 }, (_, i) => makeAgent(i)),
+];
 
 export function genHistory(agentId: string): HistoryRow[] {
   const agent = NET_AGENTS.find(a => a.id === agentId) ?? NET_AGENTS[0];
@@ -120,11 +210,12 @@ export function genHistory(agentId: string): HistoryRow[] {
 
   return Array.from({ length: 96 }, (_, i) => {
     const t    = new Date(now - (95 - i) * 15 * 60 * 1000);
-    const dl   = Math.max(1, agent.download + Math.sin(i / 6) * 8 + (rand() - 0.5) * 12);
-    const ul   = Math.max(0.5, agent.upload + (rand() - 0.5) * 4);
-    const lat  = Math.max(20, agent.latency + Math.sin(i / 4) * 40 + (rand() - 0.5) * 60);
-    const loss = Math.round((rand() * 2.5) * 100) / 100;
-    const jitter = Math.floor(rand() * 35);
+    // Tight noise around the agent's own baseline so history mirrors its (mostly healthy) status.
+    const dl   = Math.max(8, agent.download + Math.sin(i / 6) * 4 + (rand() - 0.5) * 6);
+    const ul   = Math.max(2, agent.upload + (rand() - 0.5) * 3);
+    const lat  = Math.max(20, agent.latency + Math.sin(i / 4) * 15 + (rand() - 0.5) * 25);
+    const loss = rand() < 0.85 ? 0 : Math.round(rand() * 0.5 * 100) / 100;
+    const jitter = Math.floor(rand() * 18);
     let status: HistoryRow['status'] = 'healthy';
     if (dl < 15 || lat > 400 || loss > 2) status = 'critical';
     else if (dl < 25 || lat > 150 || loss > 0.5) status = 'warning';

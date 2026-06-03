@@ -1,3 +1,5 @@
+import { LANDING_FEATURE_AGENT } from '@/lib/landing-data'
+
 function Check() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
@@ -127,11 +129,9 @@ export default function MethodTrust() {
           <div className="lp-mcard will-never reveal d1">
             <div className="lp-mquote">
               <span className="qm">&quot;</span>
-              <p>
-                RemConnect didn&apos;t just get me a job — they built the skills that keep clients asking for me by name.
-              </p>
-              <div className="at">Liya D.</div>
-              <div className="ar">Voice Support · with RemConnect 14 months</div>
+              <p>{LANDING_FEATURE_AGENT.quote}</p>
+              <div className="at">{LANDING_FEATURE_AGENT.name}</div>
+              <div className="ar">{LANDING_FEATURE_AGENT.quoteRole}</div>
             </div>
           </div>
         </div>

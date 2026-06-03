@@ -398,3 +398,101 @@ export const SUCCESS_STORIES: SuccessStory[] = [
   },
 ]
 
+// ── Landing testimonials/cards — real RemConnect agents (deployed), with photos ──
+export type LandingStory = {
+  id: string
+  photo: string
+  name: string
+  role: string
+  quote: string
+  bg: string
+  stats: { v: string; sl: string }[]
+}
+
+export const LANDING_STORIES: LandingStory[] = [
+  {
+    id: 'soliana',
+    photo: '/agents/soliana-berhanu.jpg',
+    name: 'Soliana Berhanu',
+    role: 'Sales Development · Northwind Support',
+    bg: 'linear-gradient(160deg,#1d6fd6,#0c3a7a)',
+    quote:
+      'I came in with sales experience but no remote background. RemConnect trained me, certified me, and placed me with a US team in six weeks.',
+    stats: [
+      { v: '6 wks', sl: 'To first shift' },
+      { v: '89', sl: 'QA score' },
+    ],
+  },
+  {
+    id: 'noud',
+    photo: '/agents/noud-zewgemichael.jpg',
+    name: 'Noud Zewgemichael',
+    role: 'Sales Development · Lumen Telecom',
+    bg: 'linear-gradient(160deg,#3a4a66,#1a2338)',
+    quote:
+      'Applying took ten minutes and the training meant I started genuinely ready. I’m paid in USD, on time, every single month.',
+    stats: [
+      { v: 'USD', sl: 'Paid monthly' },
+      { v: '88', sl: 'QA score' },
+    ],
+  },
+  {
+    id: 'maereg',
+    photo: '/agents/maereg-hailu.jpg',
+    name: 'Maereg Hailu',
+    role: 'Customer Support · Riverstone Health',
+    bg: 'linear-gradient(160deg,#0b4fa8,#0c3a7a)',
+    quote:
+      'The coaching is the real deal. My QA scores climbed fast and I’m now one of the top performers on my team.',
+    stats: [
+      { v: '90', sl: 'QA score' },
+      { v: '4.7', sl: 'CSAT' },
+    ],
+  },
+  {
+    id: 'hermella',
+    photo: '/agents/hermella-mulugeta.jpg',
+    name: 'Hermella Mulugeta',
+    role: 'Customer Support · Apex Insurance',
+    bg: 'linear-gradient(160deg,#24507e,#0d1f3c)',
+    quote:
+      'From application to onboarding, everything was handled. I work with an international team I never could have reached on my own.',
+    stats: [
+      { v: '87', sl: 'QA score' },
+      { v: 'Top 10%', sl: 'Team rank' },
+    ],
+  },
+]
+
+// Single featured agent used in the hero chip, the profile showcase, and the trust quote.
+export const LANDING_FEATURE_AGENT = {
+  photo: '/agents/soliana-berhanu.jpg',
+  name: 'Soliana Berhanu',
+  short: 'Soliana B.',
+  idTag: 'RC-AGENT · #3005 · Cohort 13',
+  statusLine: 'Deployed · Northwind Support',
+  role: 'Sales Development · Addis Ababa',
+  qa: 89,
+  chips: [
+    { label: 'Outbound' },
+    { label: 'CRM' },
+    { label: 'Client-ready', good: true },
+  ],
+  skills: [
+    { l: 'English', v: 86 },
+    { l: 'Rapport', v: 92 },
+    { l: 'QA score', v: 89 },
+    { l: 'CRM & tools', v: 84 },
+  ],
+  quote:
+    'RemConnect didn’t just get me a job — they built the skills that keep clients asking for me by name.',
+  quoteRole: 'Sales Development · Northwind Support',
+}
+
+// Real agent portraits for the hero trust strip (first three) + an overflow "+".
+export const LANDING_TRUST_AVATARS = [
+  { photo: '/agents/soliana-berhanu.jpg', name: 'Soliana Berhanu' },
+  { photo: '/agents/noud-zewgemichael.jpg', name: 'Noud Zewgemichael' },
+  { photo: '/agents/maereg-hailu.jpg', name: 'Maereg Hailu' },
+]
+

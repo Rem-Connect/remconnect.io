@@ -167,15 +167,185 @@ export const AUDIT: AuditEntry[] = [
   { id: 'a-14', at: '2 d ago',    who: 'Helen Assefa',    role: 'Sales Team Lead',     action: 'Edited client contract', target: 'Riverstone Health — rate +$3/hr',            tier: 'critical' },
 ]
 
-export const SAMPLE_AGENTS: SampleAgent[] = [
+const REAL_AGENTS: SampleAgent[] = [
   // Real agents from resume files
   { id: 'AD-3001', name: 'Bezawit Berhanu',  role: 'Sales Dev Rep',      status: 'bench',    client: '—', score: 82, certs: 2, years: 2, langs: ['EN','AM'],      skills: ['Outbound','CRM tools','Sales prospecting','Customer service'], rate: 5.0, photo: '/agents/bezawit-berhanu.png' },
   { id: 'AD-3002', name: 'Nahom Dereje',     role: 'Biz Dev Rep',        status: 'bench',    client: '—', score: 86, certs: 3, years: 3, langs: ['EN','AM'],      skills: ['B2B Sales','Objection Handling','Partnership building','Research'], rate: 5.2, photo: '/agents/nahom-dereje.jpg' },
   { id: 'AD-3003', name: 'Ermias Lemma',     role: 'SDR / A2P Specialist',status: 'bench',   client: '—', score: 83, certs: 2, years: 3, langs: ['EN','AM','FR'], skills: ['B2B Cold Calling','HubSpot','Apollo','A2P SMS','Lead Qualification'], rate: 5.4, photo: '/agents/ermias-lemma.png' },
   { id: 'AD-3004', name: 'Tensae Wubeshet',  role: 'Sales Dev Rep',      status: 'bench',    client: '—', score: 78, certs: 1, years: 1, langs: ['EN','AM'],      skills: ['Outbound','Communication','Sales'], rate: 4.8, photo: '/agents/tensae-wubeshet.jpg' },
-  // SDR applicants imported from the SDR Priority List spreadsheet
-  ...SDR_APPLICANT_AGENTS,
 ]
+
+// ============================================================================
+// New-media agents — photos + intro videos dropped into public/agents/, matched
+// by name to imported SDR applicants. Each gets a real photo/video plus dummy
+// work history, performance, certifications, tools, and a deployed/bench/assess
+// status. Applied as an override layer so the auto-generated sdr-applicants.ts
+// stays untouched.
+// ============================================================================
+type Cert = { t: string; d: string }
+type Hist = { co: string; role: string; when: string; current?: boolean }
+type MediaEnrich = { agent: Partial<SampleAgent>; extras: Partial<AgentProfileExtras> }
+
+// Reusable certification + tool + prior-history pools (varied per agent)
+const C_OUTBOUND: Cert = { t: 'Outbound Sales Fundamentals', d: '2026' }
+const C_CRM: Cert = { t: 'CRM & Pipeline Hygiene', d: '2026' }
+const C_DISCOVERY: Cert = { t: 'B2B Discovery & Qualification', d: '2026' }
+const C_OBJECTION: Cert = { t: 'Objection Handling · Advanced', d: '2025' }
+const C_COLD: Cert = { t: 'Cold Calling · Certified', d: '2025' }
+const C_PROSPECT: Cert = { t: 'Prospecting & Lead Generation', d: '2026' }
+
+const T_BASE = ['HubSpot', 'Google Workspace', 'Slack']
+const T_MID = ['HubSpot', 'Apollo', 'Google Workspace', 'Slack', 'Zoom']
+const T_FULL = ['HubSpot', 'Apollo', 'Salesforce', 'Aircall', 'LinkedIn Sales Navigator', 'Google Workspace', 'Slack']
+const T_LITE = ['Google Workspace', 'Slack', 'Zoom']
+
+const PRIOR_SDR: Hist[] = [{ co: 'Salaria Sales Solutions', role: 'Outreach Associate', when: '2023 – 2025' }]
+const PRIOR_BDR: Hist[] = [{ co: 'Exclusive Calls', role: 'Business Development Rep', when: '2022 – 2025' }]
+const PRIOR_CS: Hist[] = [{ co: 'Local BPO', role: 'Customer Service Associate', when: '2022 – 2024' }]
+const PRIOR_NONE: Hist[] = []
+
+function mediaPaths(slug: string, ext: string) {
+  return { photo: `/agents/${slug}.${ext}`, video: `/agents/${slug}.mp4` }
+}
+
+function deployedEnrich(slug: string, ext: string, o: {
+  client: string; since: string; pay: number; csat: number; aht: string; qa: number;
+  certs: Cert[]; tools: string[]; edu: string; prior: Hist[]; started?: string
+}): MediaEnrich {
+  const m = mediaPaths(slug, ext)
+  return {
+    agent: { photo: m.photo, status: 'deployed', client: o.client, certs: o.certs.length, rate: o.pay },
+    extras: {
+      ...m,
+      employer: 'RemConnect Talent PLC', contractType: 'Full-time · 40 hrs/wk',
+      payRate: `$${o.pay.toFixed(2)} / hr`, billRate: `$${(o.pay * 2.5).toFixed(2)} / hr`, margin: '60.0%',
+      started: o.started ?? 'Jan 2026', deployedSince: o.since,
+      csat: o.csat, aht: o.aht, qa: o.qa,
+      certifications: o.certs, tools: o.tools, education: o.edu,
+      history: [{ co: `${o.client} (via RemConnect)`, role: 'Sales Development Representative', when: `${o.since} – present`, current: true }, ...o.prior],
+    },
+  }
+}
+
+function benchEnrich(slug: string, ext: string, o: {
+  pay: number; csat: number | null; qa: number; certs: Cert[]; tools: string[]; edu: string; prior: Hist[]; started?: string
+}): MediaEnrich {
+  const m = mediaPaths(slug, ext)
+  return {
+    agent: { photo: m.photo, status: 'bench', client: '—', certs: o.certs.length, rate: o.pay },
+    extras: {
+      ...m,
+      employer: 'RemConnect Talent PLC', contractType: 'Full-time · 40 hrs/wk',
+      payRate: `$${o.pay.toFixed(2)} / hr`, billRate: `$${(o.pay * 2.5).toFixed(2)} / hr`, margin: '60.0%',
+      started: o.started ?? 'Mar 2026', deployedSince: '—',
+      csat: o.csat, aht: null, qa: o.qa,
+      certifications: o.certs, tools: o.tools, education: o.edu,
+      history: [{ co: 'RemConnect (bench)', role: 'Sales Development Representative · bench-ready', when: '2026 – present', current: true }, ...o.prior],
+    },
+  }
+}
+
+export const AGENT_MEDIA_ENRICHMENT: Record<string, MediaEnrich> = {
+  // ---- Deployed ----
+  'AD-3005': deployedEnrich('soliana-berhanu', 'jpg', { client: 'Northwind Support', since: 'Apr 2026', pay: 5.0, csat: 4.6, aht: '6:30', qa: 89, certs: [C_OUTBOUND, C_CRM, C_DISCOVERY], tools: T_FULL, edu: 'BA Marketing — Addis Ababa University', prior: PRIOR_SDR }),
+  'AD-3006': deployedEnrich('noud-zewgemichael', 'jpg', { client: 'Lumen Telecom', since: 'Mar 2026', pay: 5.2, csat: 4.5, aht: '5:54', qa: 88, certs: [C_OUTBOUND, C_COLD, C_OBJECTION], tools: T_FULL, edu: 'BSc Management — Unity University', prior: PRIOR_BDR }),
+  'AD-3018': deployedEnrich('biruktawit-adane', 'png', { client: 'Apex Insurance', since: 'Apr 2026', pay: 4.9, csat: 4.4, aht: '7:10', qa: 86, certs: [C_OUTBOUND, C_CRM], tools: T_MID, edu: 'BA Communications — AAU', prior: PRIOR_CS }),
+  'AD-3026': deployedEnrich('maereg-hailu', 'jpg', { client: 'Riverstone Health', since: 'Feb 2026', pay: 5.1, csat: 4.7, aht: '6:12', qa: 90, certs: [C_OUTBOUND, C_CRM, C_DISCOVERY], tools: T_FULL, edu: 'BSc Economics — Mekelle University', prior: PRIOR_SDR }),
+  'AD-3035': deployedEnrich('natty-negash', 'png', { client: 'Northwind Support', since: 'Mar 2026', pay: 5.3, csat: 4.5, aht: '6:40', qa: 87, certs: [C_OUTBOUND, C_OBJECTION], tools: T_FULL, edu: 'BA Marketing — Addis Ababa University', prior: PRIOR_BDR }),
+  'AD-3037': deployedEnrich('abenezer-fekadu', 'jpg', { client: 'Lumen Telecom', since: 'Apr 2026', pay: 5.0, csat: 4.3, aht: '7:20', qa: 85, certs: [C_OUTBOUND, C_COLD], tools: T_MID, edu: 'BSc Management — Unity University', prior: PRIOR_SDR }),
+  'AD-3040': deployedEnrich('amanuel-belete', 'jpg', { client: 'Apex Insurance', since: 'Mar 2026', pay: 5.2, csat: 4.6, aht: '5:48', qa: 91, certs: [C_OUTBOUND, C_CRM, C_DISCOVERY], tools: T_FULL, edu: 'BA Business — AAU', prior: PRIOR_BDR }),
+  // ---- Bench ----
+  'AD-3010': deployedEnrich('alula-ayalew', 'png', { client: 'Lumen Telecom', since: 'Apr 2026', pay: 5.0, csat: 4.4, aht: '6:50', qa: 86, certs: [C_OUTBOUND, C_CRM, C_DISCOVERY], tools: T_FULL, edu: 'BA — Addis Ababa University', prior: PRIOR_SDR }),
+  'AD-3016': benchEnrich('sosin-zerihun', 'jpg', { pay: 4.9, csat: null, qa: 86, certs: [C_OUTBOUND, C_PROSPECT], tools: T_MID, edu: 'BSc Management — Unity University', prior: PRIOR_CS }),
+  'AD-3017': benchEnrich('kidist-solomon', 'jpg', { pay: 5.0, csat: 4.3, qa: 87, certs: [C_OUTBOUND, C_CRM, C_DISCOVERY], tools: T_FULL, edu: 'BA Marketing — AAU', prior: PRIOR_BDR }),
+  'AD-3024': deployedEnrich('filimon-fekadu', 'jpg', { client: 'Riverstone Health', since: 'Apr 2026', pay: 4.9, csat: 4.3, aht: '7:05', qa: 85, certs: [C_OUTBOUND, C_CRM], tools: T_MID, edu: 'High School Diploma — Addis Ababa', prior: PRIOR_SDR }),
+  'AD-3027': deployedEnrich('mihret-mulatu', 'jpg', { client: 'Northwind Support', since: 'Mar 2026', pay: 5.0, csat: 4.4, aht: '6:34', qa: 86, certs: [C_OUTBOUND, C_CRM, C_OBJECTION], tools: T_MID, edu: 'BA Communications — AAU', prior: PRIOR_CS }),
+  'AD-3029': benchEnrich('ruth-masresha', 'png', { pay: 4.9, csat: 4.4, qa: 85, certs: [C_OUTBOUND, C_PROSPECT], tools: T_MID, edu: 'BSc Economics — Mekelle University', prior: PRIOR_SDR }),
+  'AD-3034': deployedEnrich('nebait-aemro', 'png', { client: 'Apex Insurance', since: 'Feb 2026', pay: 5.2, csat: 4.6, aht: '6:05', qa: 90, certs: [C_OUTBOUND, C_CRM, C_COLD], tools: T_FULL, edu: 'BSc Management — Unity University', prior: PRIOR_BDR }),
+  'AD-3039': deployedEnrich('ermias-abadi', 'jpg', { client: 'Riverstone Health', since: 'Mar 2026', pay: 5.2, csat: 4.5, aht: '6:20', qa: 88, certs: [C_OUTBOUND, C_OBJECTION, C_DISCOVERY], tools: T_FULL, edu: 'BSc Computer Science — HiLCoE', prior: PRIOR_SDR }),
+  // ---- Bench / Deployed (formerly assessment — real agents stay deployed or bench) ----
+  'AD-3021': benchEnrich('yeabsira-ayalew', 'jpg', { pay: 4.7, csat: null, qa: 82, certs: [C_OUTBOUND, C_CRM], tools: T_MID, edu: 'BA — Addis Ababa University', prior: PRIOR_CS }),
+  'AD-3025': deployedEnrich('basleal-abera', 'jpg', { client: 'Lumen Telecom', since: 'Apr 2026', pay: 4.9, csat: 4.3, aht: '7:00', qa: 85, certs: [C_OUTBOUND, C_CRM], tools: T_MID, edu: 'BSc Management — Unity University', prior: PRIOR_SDR }),
+  'AD-3033': benchEnrich('metsnanat-tigistu', 'png', { pay: 4.7, csat: 4.0, qa: 82, certs: [C_OUTBOUND], tools: T_BASE, edu: 'BA Communications — AAU', prior: PRIOR_NONE }),
+  'AD-3036': deployedEnrich('hermella-mulugeta', 'jpg', { client: 'Apex Insurance', since: 'Mar 2026', pay: 5.0, csat: 4.5, aht: '6:30', qa: 87, certs: [C_OUTBOUND, C_CRM, C_DISCOVERY], tools: T_FULL, edu: 'BA Marketing — AAU', prior: PRIOR_CS }),
+  'AD-3042': benchEnrich('mahlet-tadesse', 'jpg', { pay: 4.7, csat: null, qa: 81, certs: [C_OUTBOUND, C_CRM], tools: T_MID, edu: 'High School Diploma — Addis Ababa', prior: PRIOR_NONE }),
+}
+
+// New agent (no spreadsheet row): Edom Abraha — media provided, no roster match.
+const EDOM_AGENT: SampleAgent = {
+  id: 'AD-3055', name: 'Edom Abraha', role: 'Sales Dev Rep', status: 'bench', client: '—',
+  score: 80, certs: 1, years: 1, langs: ['EN', 'AM'],
+  skills: ['Outbound', 'Communication', 'Customer service'], rate: 4.7, photo: '/agents/edom-abraha.jpg',
+}
+
+const EDOM_EXTRAS: AgentProfileExtras = {
+  headline: 'Sales Development Representative · bench-ready',
+  pitch: 'Trained and certified through the RemConnect program. Strong communicator with a customer-first mindset, bench-ready and available for placement.',
+  photo: '/agents/edom-abraha.jpg', video: '/agents/edom-abraha.mp4',
+  location: 'Addis Ababa, ET', timezone: 'EAT (UTC+3)', hours: 'Full-time (40 hrs/week)',
+  email: 'edom.abraha@example.com', phone: '+251 900 000 000',
+  employer: 'RemConnect Talent PLC', contractType: 'Full-time · 40 hrs/wk',
+  payRate: '$4.70 / hr', billRate: '$11.75 / hr', margin: '60.0%', started: 'May 2026', deployedSince: '—',
+  csat: null, aht: null, qa: 80,
+  tools: ['Google Workspace', 'Slack', 'Zoom'],
+  education: 'BA — Addis Ababa University',
+  certifications: [C_OUTBOUND],
+  history: [{ co: 'RemConnect (bench)', role: 'Sales Development Representative · bench-ready', when: '2026 – present', current: true }],
+  notes: [],
+}
+
+// Apply agent-level overrides (photo/status/client/certs/rate) onto the imported applicants.
+const ENRICHED_APPLICANTS: SampleAgent[] = SDR_APPLICANT_AGENTS.map((a) => {
+  const o = AGENT_MEDIA_ENRICHMENT[a.id]
+  return o ? { ...a, ...o.agent } : a
+})
+
+// Agents that have a real photo/video — these sort to the top of the directory.
+const MEDIA_IDS = new Set<string>([
+  'AD-3001', 'AD-3002', 'AD-3003', 'AD-3004', EDOM_AGENT.id,
+  ...Object.keys(AGENT_MEDIA_ENRICHMENT),
+])
+
+// Manual directory ordering for the featured (media) agents.
+// TOP_ORDER: pinned to the very top, in this exact order.
+// BOTTOM_ORDER: kept at the bottom of the media block, just above the recruit applicants.
+// Any other media agents fall in the middle (their existing relative order is preserved).
+const TOP_ORDER = [
+  'AD-3024', // Filimon Fekadu
+  'AD-3027', // Mihret Mulatu
+  'AD-3005', // Soliana Berhanu
+  'AD-3055', // Edom Abraha
+  'AD-3002', // Nahom Dereje
+  'AD-3004', // Tensae Wubeshet
+]
+const BOTTOM_ORDER = [
+  'AD-3018', // Biruktawit Adane (Brook)
+  'AD-3017', // Kidist Solomon
+  'AD-3042', // Mahlet Tadesse
+  'AD-3029', // Ruth Masresha
+  'AD-3016', // Sosin Zerihun
+]
+
+function directoryRank(a: SampleAgent): number {
+  if (!MEDIA_IDS.has(a.id)) return 100000        // recruit applicants — after all media agents
+  const top = TOP_ORDER.indexOf(a.id)
+  if (top !== -1) return top                     // 0..n — pinned to the very top
+  const bottom = BOTTOM_ORDER.indexOf(a.id)
+  if (bottom !== -1) return 1000 + bottom        // bottom of the media block
+  return 500                                     // other media agents — middle
+}
+
+// Stable sort: TOP_ORDER → middle media → BOTTOM_ORDER → recruit applicants.
+export const SAMPLE_AGENTS: SampleAgent[] = [...REAL_AGENTS, EDOM_AGENT, ...ENRICHED_APPLICANTS]
+  .sort((a, b) => directoryRank(a) - directoryRank(b))
+
+// Imported applicant extras with media + dummy enrichment merged over the base entry.
+const APPLICANT_EXTRAS_WITH_MEDIA: Record<string, AgentProfileExtras> = Object.fromEntries(
+  Object.entries(SDR_APPLICANT_EXTRAS).map(([id, ex]) => {
+    const o = AGENT_MEDIA_ENRICHMENT[id]
+    return [id, o ? { ...ex, ...o.extras } : ex]
+  })
+)
 
 export const AGENT_EXTRAS: Record<string, AgentProfileExtras> = {
   'AD-3001': {
@@ -303,7 +473,8 @@ export const AGENT_EXTRAS: Record<string, AgentProfileExtras> = {
     ],
     notes: [],
   },
-  ...SDR_APPLICANT_EXTRAS,
+  ...APPLICANT_EXTRAS_WITH_MEDIA,
+  [EDOM_AGENT.id]: EDOM_EXTRAS,
   __default: {
     headline: 'Customer experience professional',
     pitch: 'Reliable, well-trained, and ready to deploy. Detailed performance and reference data available on request.',

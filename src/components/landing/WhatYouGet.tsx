@@ -1,4 +1,7 @@
+import { LANDING_FEATURE_AGENT } from '@/lib/landing-data'
+
 export default function WhatYouGet() {
+  const f = LANDING_FEATURE_AGENT
   return (
     <section className="lp-section tight" id="why" data-screen-label="What you get">
       <div className="lp-getgrid">
@@ -58,48 +61,31 @@ export default function WhatYouGet() {
             <div className="lp-profile-top">
               <span className="lp-profile-chip">
                 <span className="d" />
-                Bench-ready · placeable
+                {f.statusLine}
               </span>
-              <div className="lp-profile-id">RC-AGENT · #2847 · Cohort 14</div>
-              <div className="lp-profile-av">L</div>
+              <div className="lp-profile-id">{f.idTag}</div>
+              <div className="lp-profile-av">
+                <img src={f.photo} alt={f.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit', display: 'block' }} />
+              </div>
             </div>
             <div className="lp-profile-body">
-              <div className="lp-profile-name">Liya D.</div>
-              <div className="lp-profile-role">Voice &amp; Written Support · Addis Ababa</div>
+              <div className="lp-profile-name">{f.name}</div>
+              <div className="lp-profile-role">{f.role}</div>
               <div className="lp-profile-meta">
-                <span className="rc-chip">Voice</span>
-                <span className="rc-chip">Written</span>
-                <span className="rc-chip rc-chip-good">De-escalation</span>
+                {f.chips.map((c) => (
+                  <span key={c.label} className={`rc-chip${c.good ? ' rc-chip-good' : ''}`}>{c.label}</span>
+                ))}
               </div>
               <div className="lp-profile-skills">
-                <div className="lp-cs">
-                  <span className="lp-cs-l">English</span>
-                  <span className="lp-cs-bar" data-skill="86">
-                    <span />
-                  </span>
-                  <span className="lp-cs-v tnum">86</span>
-                </div>
-                <div className="lp-cs">
-                  <span className="lp-cs-l">Empathy</span>
-                  <span className="lp-cs-bar" data-skill="92">
-                    <span />
-                  </span>
-                  <span className="lp-cs-v tnum">92</span>
-                </div>
-                <div className="lp-cs">
-                  <span className="lp-cs-l">Written QA</span>
-                  <span className="lp-cs-bar" data-skill="90">
-                    <span />
-                  </span>
-                  <span className="lp-cs-v tnum">90</span>
-                </div>
-                <div className="lp-cs">
-                  <span className="lp-cs-l">Systems</span>
-                  <span className="lp-cs-bar" data-skill="78">
-                    <span />
-                  </span>
-                  <span className="lp-cs-v tnum">78</span>
-                </div>
+                {f.skills.map((s) => (
+                  <div className="lp-cs" key={s.l}>
+                    <span className="lp-cs-l">{s.l}</span>
+                    <span className="lp-cs-bar" data-skill={s.v}>
+                      <span />
+                    </span>
+                    <span className="lp-cs-v tnum">{s.v}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
