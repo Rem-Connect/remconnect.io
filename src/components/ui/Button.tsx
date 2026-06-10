@@ -1,40 +1,39 @@
 import React from 'react'
+import { cn } from '@/lib/cn'
 
 type ButtonVariant = 'primary' | 'blue' | 'ghost' | 'ghost-dark'
+type ButtonSize = 'sm' | 'md'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
-  size?: 'sm' | 'md'
+  size?: ButtonSize
 }
 
-const BASE: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 8,
-  borderRadius: 6,
-  border: '1px solid transparent',
-  fontWeight: 500,
-  fontSize: 13,
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-  transition: 'transform 0.06s ease, background 0.15s ease',
+const BASE =
+  'inline-flex items-center gap-2 rounded-sm border border-transparent font-medium ' +
+  'cursor-pointer transition-[transform,background] duration-150'
+
+const VARIANTS: Record<ButtonVariant, string> = {
+  primary: 'bg-rc-ink text-rc-paper',
+  blue: 'bg-rc-blue text-white',
+  ghost: 'bg-transparent text-rc-ink border-rc-line',
+  'ghost-dark': 'bg-transparent text-rc-paper border-rc-ink-4',
 }
 
-const VARIANTS: Record<ButtonVariant, React.CSSProperties> = {
-  primary:    { background: '#0b1220', color: '#faf9f6', borderColor: 'transparent' },
-  blue:       { background: '#1d6fd6', color: '#fff',    borderColor: 'transparent' },
-  ghost:      { background: 'transparent', color: '#0b1220', borderColor: '#e3e0d2' },
-  'ghost-dark': { background: 'transparent', color: '#faf9f6', borderColor: '#243150' },
+const SIZES: Record<ButtonSize, string> = {
+  sm: 'px-2.5 py-[5px] text-xs',
+  md: 'px-3.5 py-[9px] text-[13px]',
 }
 
-const SIZES: Record<'sm' | 'md', React.CSSProperties> = {
-  sm: { padding: '5px 10px', fontSize: 12 },
-  md: { padding: '9px 14px', fontSize: 13 },
-}
-
-export function Button({ variant = 'ghost', size = 'md', style, children, ...props }: ButtonProps) {
+export function Button({
+  variant = 'ghost',
+  size = 'md',
+  className,
+  children,
+  ...props
+}: ButtonProps) {
   return (
-    <button style={{ ...BASE, ...VARIANTS[variant], ...SIZES[size], ...style }} {...props}>
+    <button className={cn(BASE, VARIANTS[variant], SIZES[size], className)} {...props}>
       {children}
     </button>
   )

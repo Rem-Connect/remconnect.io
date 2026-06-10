@@ -1,4 +1,5 @@
 import React from 'react'
+import { cn } from '@/lib/cn'
 
 type ChipVariant = 'default' | 'dark' | 'good' | 'bad' | 'neutral' | 'warn'
 
@@ -9,56 +10,21 @@ interface ChipProps {
   style?: React.CSSProperties
 }
 
-const VARIANT_STYLES: Record<ChipVariant, React.CSSProperties> = {
-  default: {
-    background: 'rgba(29,111,214,0.10)',
-    color: '#0c3a7a',
-    border: '1px solid rgba(29,111,214,0.22)',
-  },
-  dark: {
-    background: 'rgba(124,179,245,0.12)',
-    color: '#7cb3f5',
-    border: '1px solid rgba(124,179,245,0.25)',
-  },
-  good: {
-    background: 'rgba(47,141,92,0.12)',
-    color: '#2f8d5c',
-    border: '1px solid rgba(47,141,92,0.25)',
-  },
-  bad: {
-    background: 'rgba(181,72,56,0.12)',
-    color: '#b54838',
-    border: '1px solid rgba(181,72,56,0.25)',
-  },
-  neutral: {
-    background: 'rgba(90,96,114,0.08)',
-    color: '#5a6072',
-    border: '1px solid rgba(90,96,114,0.2)',
-  },
-  warn: {
-    background: 'rgba(192,138,42,0.14)',
-    color: '#0c3a7a',
-    border: '1px solid rgba(192,138,42,0.3)',
-  },
+const BASE =
+  'inline-flex items-center gap-1.5 rounded-full border px-2 py-[3px] text-[11px] font-medium tracking-[0.01em]'
+
+const VARIANTS: Record<ChipVariant, string> = {
+  default: 'bg-rc-blue/10 text-rc-blue-ink border-rc-blue/20',
+  dark: 'bg-rc-blue-soft/10 text-rc-blue-soft border-rc-blue-soft/25',
+  good: 'bg-rc-good/10 text-rc-good border-rc-good/25',
+  bad: 'bg-rc-bad/10 text-rc-bad border-rc-bad/25',
+  neutral: 'bg-rc-muted/10 text-rc-muted border-rc-muted/20',
+  warn: 'bg-rc-warn/15 text-rc-blue-ink border-rc-warn/30',
 }
 
 export function Chip({ children, variant = 'default', className, style }: ChipProps) {
   return (
-    <span
-      className={className}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        padding: '3px 8px',
-        borderRadius: 999,
-        fontSize: 11,
-        fontWeight: 500,
-        letterSpacing: '0.01em',
-        ...VARIANT_STYLES[variant],
-        ...style,
-      }}
-    >
+    <span className={cn(BASE, VARIANTS[variant], className)} style={style}>
       {children}
     </span>
   )

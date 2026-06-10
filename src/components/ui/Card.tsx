@@ -1,4 +1,5 @@
 import React from 'react'
+import { cn } from '@/lib/cn'
 
 interface CardProps {
   children: React.ReactNode
@@ -8,13 +9,16 @@ interface CardProps {
   style?: React.CSSProperties
 }
 
-export function Card({ children, dark = false, padding, className, style }: CardProps) {
-  const base: React.CSSProperties = dark
-    ? { background: '#121a2b', border: '1px solid #243150', borderRadius: 10 }
-    : { background: '#fff', border: '1px solid #e3e0d2', borderRadius: 10, boxShadow: '0 1px 2px rgba(11,18,32,0.06)' }
+const BASE = 'rounded-md border'
+const LIGHT = 'bg-white border-rc-line shadow-sm'
+const DARK = 'bg-rc-ink-2 border-rc-ink-4'
 
+export function Card({ children, dark = false, padding, className, style }: CardProps) {
   return (
-    <div className={className} style={{ ...base, ...(padding !== undefined ? { padding } : {}), ...style }}>
+    <div
+      className={cn(BASE, dark ? DARK : LIGHT, className)}
+      style={padding !== undefined ? { padding, ...style } : style}
+    >
       {children}
     </div>
   )

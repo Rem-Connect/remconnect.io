@@ -1,10 +1,13 @@
-const TONES: [string, string][] = [
-  ['#1d6fd6', '#fff'],
-  ['#3f6b4e', '#fff'],
-  ['#4a6b8a', '#fff'],
-  ['#0c3a7a', '#fff'],
-  ['#0c3a7a', '#7cb3f5'],
-  ['#1a2338', '#7cb3f5'],
+import { cn } from '@/lib/cn'
+
+/** Tailwind class pairs (background + foreground) for each avatar tone. */
+const TONES: string[] = [
+  'bg-rc-blue text-white',
+  'bg-rc-green text-white',
+  'bg-rc-sky text-white',
+  'bg-rc-blue-ink text-white',
+  'bg-rc-blue-ink text-rc-blue-soft',
+  'bg-rc-ink-3 text-rc-blue-soft',
 ]
 
 interface AvatarProps {
@@ -14,16 +17,22 @@ interface AvatarProps {
 }
 
 export function Avatar({ name = 'A', tone = 0, size = 32 }: AvatarProps) {
-  const [bg, fg] = TONES[tone % TONES.length]
-  const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+  const initials = name
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+
   return (
-    <div style={{
-      width: size, height: size, borderRadius: '50%',
-      background: bg, color: fg,
-      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.38, fontWeight: 600, fontFamily: 'var(--font-family-sans)',
-      flexShrink: 0, letterSpacing: '0.02em',
-    }}>
+    <div
+      className={cn(
+        'inline-flex shrink-0 items-center justify-center rounded-full font-sans font-semibold tracking-[0.02em]',
+        TONES[tone % TONES.length],
+      )}
+      // Size is a dynamic prop, so width/height/font-size stay inline per the styling standard.
+      style={{ width: size, height: size, fontSize: size * 0.38 }}
+    >
       {initials}
     </div>
   )
